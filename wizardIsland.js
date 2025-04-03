@@ -1,5 +1,5 @@
-//const url = "https://localhost:7198"
-const url = "https://wizardislandrestapi.azurewebsites.net/"
+const url = "https://localhost:7198"
+//const url = "https://wizardislandrestapi.azurewebsites.net/"
 
 var playerId = -1
 var playerPassword = ""
@@ -28,6 +28,7 @@ var spellCooldownButtons = []
 
 var myName = ""
 var myColor = {r:Math.floor(Math.random() * 150), g:Math.floor(Math.random() * 150), b:Math.floor(Math.random() * 150)} 
+var framesSinceLastDataRecieved = 0
 
 async function start()
 {
@@ -42,9 +43,15 @@ async function update()
         moveCamera()
         draw()
         update()
+        framesSinceLastDataRecieved = 0
     }
     else
-        reset()
+    {
+        framesSinceLastDataRecieved++
+        if (framesSinceLastDataRecieved > 10) // we need to not get gameData, for 10 updates in a row, before we disconnect
+            reset()
+        else update()
+    }
 }
 function reset() 
 {
@@ -239,15 +246,21 @@ function draw()
             context.fillText(txt,
                 screenWidth / 2 - textSize.width / 2,
                 20)
+            // current event
+            txt = "Current event: " + gameData.event.name;
+            textSize = context.measureText(txt)
+            context.fillText(txt,
+                screenWidth / 2 - textSize.width / 2,
+                40)
             // kills text
-            var txt = gameData.players[playerId].kills + " kills"
-            var textSize = context.measureText(txt)
+            txt = gameData.players[playerId].kills + " kills"
+            textSize = context.measureText(txt)
             context.fillText(txt,
                 screenWidth - textSize.width - 10,
                 20)
             // deaths text
-            var txt = gameData.players[playerId].deaths + " deaths"
-            var textSize = context.measureText(txt)
+            txt = gameData.players[playerId].deaths + " deaths"
+            textSize = context.measureText(txt)
             context.fillText(txt,
                 screenWidth - textSize.width - 10,
                 40)
@@ -300,11 +313,10 @@ function keyboardDown(event)
     }
     event.preventDefault()
     const spellToUse = event.key - '1'
-    console.log("Spell to use: " + spellToUse)
+    //console.log("Spell to use: " + spellToUse)
     if (!isNaN(spellToUse) && spellToUse >= 0 && spellToUse < selectedSpellIds.length)
     {
         selectSpellToCast(spellToUse)
-        console.log(spellToCast)
         return
     }
     if (event.key == ' ')
@@ -476,6 +488,7 @@ async function getGameUpdate()
         }})
         gameData = response.data
         gameTick = gameData.gameTick
+        mapData = gameData.map
         updateSpellUI()
     } catch (error) {
         console.log("Error: \n" + error)
