@@ -139,15 +139,28 @@ function customize(nameIsSelected = false)
 
 function selectSpells()
 {
-    //clearUIButtons()
+    const padding = .05;
+    const columns = 3
+    const btnW = (1 - (columns + 2) * padding)/(columns + 1);
+    const btnH = .1;
     AllUI = []
-    addUI(.1, .1, .2, .1, "Back", () => { createMenuButtons() })
-    addUI(.1, .3, .2, .1, JSON.stringify(selectedSpellIds), () => {  })
+    addUI(padding, padding, btnW, btnH, "Back", () => { createMenuButtons() })
+    // show currently selected spells
+    {
+        const spellCount = selectedSpellIds.length
+        const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
+        var spellNames = []
+        for (var i = 0; i < spellCount; i++)
+            spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]])
+        addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
+    }
     for (var i = 0; i < availableSpells.length; i++)
     {
         const num = i
         const name = availableSpells[i]
-        addUI(.4, .1 + num * .15, .2, .1, name, () => { 
+        const x = padding + (num % columns + 1) * (btnW + padding)
+        const y = padding + Math.floor(num / columns) * (btnH+padding)
+        addUI(x, y, btnW, btnH, name, () => { 
             const index = selectedSpellIds.indexOf(num);
             if (index > -1) {
                 selectedSpellIds.splice(index, 1);
