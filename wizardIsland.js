@@ -47,8 +47,7 @@ async function update()
     }
     else
     {
-        framesSinceLastDataRecieved++
-        if (framesSinceLastDataRecieved > 10) // we need to not get gameData, for 10 updates in a row, before we disconnect
+        if (framesSinceLastDataRecieved++ > 10) // we need to not get gameData, for 10 updates in a row, before we disconnect
             reset()
         else update()
     }
@@ -504,6 +503,7 @@ async function getGameUpdate()
         mapData = gameData.map
         updateSpellUI()
     } catch (error) {
+        gameData = null
         console.log("Error: \n" + error)
     }
 }
