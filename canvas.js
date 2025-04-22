@@ -3,6 +3,7 @@ context = null
 screenWidth = 1
 screenHeight = 1
 const textHeight = 10
+var MousePosition = {x:0, y:0}
 function getCanvas()
 {
     canvas = document.getElementById("gameFrame")
@@ -11,6 +12,7 @@ function getCanvas()
     
     windowResized(null);
     canvas.addEventListener("click", clickedOnPage)
+    canvas.addEventListener("mousemove", (event) => { MousePosition.x = event.layerX; MousePosition.y = event.layerY });
     window.addEventListener("keydown", keyboardDown)
     window.addEventListener("keyup", keyboardUp)
     window.addEventListener("resize", windowResized);

@@ -13,6 +13,7 @@ var gameTicksPerSecond = 30
 
 var cameraPos = {x:0, y: 0}
 var cameraView = {x:100, y: 56.25}
+var quickCast = true
 
 const lavaColor = "rgb(255, 150, 0)"
 const groundColor = "rgb(75, 39, 0)"
@@ -29,6 +30,8 @@ var spellCooldownButtons = []
 var myName = ""
 var myColor = {r:Math.floor(Math.random() * 150), g:Math.floor(Math.random() * 150), b:Math.floor(Math.random() * 150)} 
 var framesSinceLastDataRecieved = 0
+
+const spriteDictionary = {}
 
 async function start()
 {
@@ -209,9 +212,16 @@ function draw()
             const y = getY(entity.pos.y);
             const size = entity.size
             context.fillStyle = "rgb(" + entity.color + ")"
-            context.beginPath();
-            context.ellipse(x, y, size * scale.x, size * scale.y, 0, 0, 2 * Math.PI)
-            context.fill();
+            // draw sprite, if we have one for this entity
+            //console.log(entity);
+            if (spriteDictionary[entity.entityId]) {
+
+            }
+            else {
+                context.beginPath();
+                context.ellipse(x, y, size * scale.x, size * scale.y, 0, 0, 2 * Math.PI)
+                context.fill();
+            }
         }
 
         // draw characters
@@ -394,6 +404,13 @@ function keyboardUp(event)
 
 function selectSpellToCast(spellId)
 {
+    if (quickCast)
+    {
+        const mousePosWorld = { x: MousePosition.x * cameraView.x / screenWidth  + cameraPos.x - cameraView.x / 2, 
+                                y: MousePosition.y * cameraView.y / screenHeight + cameraPos.y - cameraView.y / 2 }
+        castSpell(spellId, mousePosWorld)
+        return
+    }
     if (spellToCast == spellId)
         spellToCast = -1
     else
