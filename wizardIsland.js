@@ -33,15 +33,35 @@ var framesSinceLastDataRecieved = 0
 
 const spriteDictionary = {}
 
+var playerStats = []
+
 async function start()
 {
+    loadImages()
     await getAvailableGames()
+}
+
+function loadImages() {
+    spriteDictionary["FireBall"] = loadOneImage("FireBall")
+    spriteDictionary["HomingBolt"] = loadOneImage("HomingBolt")
+    spriteDictionary["FrostField"] = loadOneImage("FrostField")
+    spriteDictionary["Barrel"] = loadOneImage("Barrel")
+    spriteDictionary["CrescentMoon"] = loadOneImage("CrescentMoon")
+    spriteDictionary["SnakeHead"] = loadOneImage("SnakeHead")
+    spriteDictionary["SnakeBody"] = loadOneImage("SnakeBody")
+    spriteDictionary["SnakeTail"] = loadOneImage("SnakeTail")
+    spriteDictionary["BlackHole"] = loadOneImage("BlackHole")
+    spriteDictionary["Swap"] = loadOneImage("Swap")
+}
+function loadOneImage(name) {
+    const img = new Image();
+    img.src = "res/" + name + ".png"
+    return img
 }
 
 async function update()
 {
-    await getGameUpdate()
-    if (gameData != null)
+    if (await getGameUpdate())
     {
         moveCamera()
         draw()
@@ -100,6 +120,17 @@ function createMenuButtons()
     {
         const num = availableGames[i]
         addUI(.4, .1 + i * .25, .2, .2, "game: " + num, () => { joinGame(num) })
+    }
+    // show previous games stats
+    if (playerStats.length != 0)
+    {
+        txt = [playerStats.length + 1]
+        txt[0] = "Previous games player stats (Name: kills / deaths):"
+        for (var i = 0; i < playerStats.length; i++)
+        {
+            const player = playerStats[i]
+            txt[i+1] = player.name + ": " + player.kills + " / " + player.deaths
+        }
     }
     draw()
 }
@@ -215,7 +246,10 @@ function draw()
             // draw sprite, if we have one for this entity
             //console.log(entity);
             if (spriteDictionary[entity.entityId]) {
-
+                const img = spriteDictionary[entity.entityId]
+                const extraSizeMult = 2.1
+                const scaledSize = {x: size * scale.x * extraSizeMult, y: size * scale.y * extraSizeMult}
+                drawPixelatedImage(img, x - scaledSize.x / 2,  y - scaledSize.y / 2, scaledSize.x, scaledSize.y)
             }
             else {
                 context.beginPath();
@@ -287,10 +321,13 @@ function draw()
                 screenWidth - textSize.width - 10,
                 40)
         }
-    }
+    } else { console.log("abc " + (abad++)) }
     // draw UI
     drawUI()
+
+    switchBuffer()
 }
+var abad = 0
 
 function clickedOnPage(event)
 {
@@ -507,7 +544,7 @@ async function joinGame(gameToJoinId)
 
 async function getGameUpdate()
 {
-    gameData = null
+    //gameData = null
     try {
         const response = await axios.get(url + "/" + gameId, {
         headers: {
@@ -516,13 +553,16 @@ async function getGameUpdate()
             'gameTick': gameTick
         }})
         gameData = response.data
+        playerStats = gameData.players
         gameTick = gameData.gameTick
         mapData = gameData.map
         updateSpellUI()
+        return true
     } catch (error) {
         gameData = null
         console.log("Error: \n" + error)
     }
+    return false
 }
 
 function updateSpellUI() 
