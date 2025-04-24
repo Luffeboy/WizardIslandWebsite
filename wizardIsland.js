@@ -131,7 +131,7 @@ function createMenuButtons()
             const player = playerStats[i]
             txt[i+1] = player.name + ": " + player.kills + " / " + player.deaths
         }
-        addUI(.7, .1, .2, .1 + txt.length * textHeight, txt)
+        addUI(.7, .1, .2, .1 + (txt.length * textHeight / screenHeight), txt)
     }
     draw()
 }
