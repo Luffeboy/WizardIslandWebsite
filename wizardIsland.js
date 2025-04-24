@@ -131,6 +131,7 @@ function createMenuButtons()
             const player = playerStats[i]
             txt[i+1] = player.name + ": " + player.kills + " / " + player.deaths
         }
+        addUI(.7, .1, .2, .1 + txt.length * textHeight, txt)
     }
     draw()
 }
@@ -206,6 +207,7 @@ function selectSpells()
     }
     draw()
 }
+
 function draw()
 {
     // clear
@@ -242,16 +244,16 @@ function draw()
             const x = getX(entity.pos.x);
             const y = getY(entity.pos.y);
             const size = entity.size
-            context.fillStyle = "rgb(" + entity.color + ")"
             // draw sprite, if we have one for this entity
             //console.log(entity);
             if (spriteDictionary[entity.entityId]) {
                 const img = spriteDictionary[entity.entityId]
                 const extraSizeMult = 2.1
                 const scaledSize = {x: size * scale.x * extraSizeMult, y: size * scale.y * extraSizeMult}
-                drawPixelatedImage(img, x - scaledSize.x / 2,  y - scaledSize.y / 2, scaledSize.x, scaledSize.y)
+                drawPixelatedImage(img, x,  y, scaledSize.x, scaledSize.y, entity.angle)
             }
             else {
+                context.fillStyle = "rgb(" + entity.color + ")"
                 context.beginPath();
                 context.ellipse(x, y, size * scale.x, size * scale.y, 0, 0, 2 * Math.PI)
                 context.fill();
@@ -321,13 +323,12 @@ function draw()
                 screenWidth - textSize.width - 10,
                 40)
         }
-    } else { console.log("abc " + (abad++)) }
+    }
     // draw UI
     drawUI()
 
-    switchBuffer()
+    //switchBuffer()
 }
-var abad = 0
 
 function clickedOnPage(event)
 {

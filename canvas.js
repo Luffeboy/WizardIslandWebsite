@@ -11,15 +11,15 @@ var extraContext
 function getCanvas()
 {
     canvas = document.getElementById("gameFrame")
-    //context = canvas.getContext("2d")
-    extraContext = canvas.getContext("2d")
+    context = canvas.getContext("2d")
+    //extraContext = canvas.getContext("2d")
     
-    extraCanvas = document.createElement("canvas")
+    //extraCanvas = document.createElement("canvas")
     //extraContext = extraCanvas.getContext("2d")
-    context = extraCanvas.getContext("2d")
+    //context = extraCanvas.getContext("2d")
 
     context.font = textHeight + "px serif"
-    extraContext.font = textHeight + "px serif"
+    //extraContext.font = textHeight + "px serif"
 
     windowResized(null);
     canvas.addEventListener("click", clickedOnPage)
@@ -38,19 +38,23 @@ function windowResized(event)
     canvas.width = screenWidth
     canvas.height = screenHeight
 
-    extraCanvas.width = screenWidth
-    extraCanvas.height = screenHeight
+    //extraCanvas.width = screenWidth
+    //extraCanvas.height = screenHeight
     draw()
 }
 
-function drawPixelatedImage(img, x, y, w, h)
+function drawPixelatedImage(img, x, y, w, h, angle = 0)
 {
+    context.save()
     context.imageSmoothingEnabled = false;
-    context.drawImage(img, 0, 0, img.width, img.height, x,  y, w, h)
+    context.translate(x, y);
+    context.rotate(angle);
+    context.drawImage(img, 0, 0, img.width, img.height, -w/2,  -h/2, w, h)
     context.imageSmoothingEnabled = true;
+    context.restore()
 }
 
 function switchBuffer()
 {
-    extraContext.drawImage(extraCanvas, 0, 0)
+    //extraContext.drawImage(extraCanvas, 0, 0)
 }
