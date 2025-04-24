@@ -208,12 +208,13 @@ function selectSpells()
     for (var i = 0; i < spellsToDisplay.length; i++)
     {
         const num = i
-        const name = spellsToDisplay[i].spellInfo.name
+        const name = spellsToDisplay[num].spellInfo.name
+        const cooldown = spellsToDisplay[num].spellInfo.cooldown
         const x = padding + (num % columns + 1) * (btnW + padding)
         const y = padding + Math.floor(num / columns) * (btnH+padding) + (padding + btnH)
         
         const spellId = spellsToDisplay[i].id
-        addUI(x, y, btnW, btnH, name, () => { 
+        addUI(x, y, btnW, btnH, [name, "Cooldown: " + cooldown.toFixed(2)], () => { 
             const index = selectedSpellIds.indexOf(spellId);
             if (index > -1) {
                 selectedSpellIds.splice(index, 1);
