@@ -19,6 +19,8 @@ const lavaColor = "rgb(255, 150, 0)"
 const groundColor = "rgb(75, 39, 0)"
 
 var availableSpells = []
+var spellTypes = []
+var currentlyLookingAtSpellsOfType = 0
 var selectedSpellIds = []
 var heldCameraMovementButtons = [false, false, false, false]
 
@@ -185,26 +187,62 @@ function selectSpells()
         const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
         var spellNames = []
         for (var i = 0; i < spellCount; i++)
-            spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]])
+            spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]].name)
         addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
     }
-    for (var i = 0; i < availableSpells.length; i++)
+
+    //currentlyLookingAtSpellsOfType
+
+    for (var i = 0; i < spellTypes.length; i++)
     {
         const num = i
-        const name = availableSpells[i]
+        const btnBgCol = (currentlyLookingAtSpellsOfType == num) ? "rgb(50, 50, 50)" : "rgb(0, 0, 0)"
+        addUI(padding + (padding + btnW) * (i+1), padding, btnW, btnH, spellTypes[num], () => { currentlyLookingAtSpellsOfType = num; selectSpells() }, btnBgCol)
+    }
+
+    var spellsToDisplay = []
+    for (var i = 0; i < availableSpells.length; i++)
+        if (availableSpells[i].type == currentlyLookingAtSpellsOfType)
+            spellsToDisplay.push({id: i, spellInfo: availableSpells[i]})
+
+    for (var i = 0; i < spellsToDisplay.length; i++)
+    {
+        const num = i
+        const name = spellsToDisplay[i].spellInfo.name
         const x = padding + (num % columns + 1) * (btnW + padding)
-        const y = padding + Math.floor(num / columns) * (btnH+padding)
+        const y = padding + Math.floor(num / columns) * (btnH+padding) + (padding + btnH)
+        
+        const spellId = spellsToDisplay[i].id
         addUI(x, y, btnW, btnH, name, () => { 
-            const index = selectedSpellIds.indexOf(num);
+            const index = selectedSpellIds.indexOf(spellId);
             if (index > -1) {
                 selectedSpellIds.splice(index, 1);
             }
             else {
-                selectedSpellIds.push(num)
+                selectedSpellIds.push(spellId)
             }
             selectSpells()
          })
     }
+
+
+    // for (var i = 0; i < availableSpells.length; i++)
+    // {
+    //     const num = i
+    //     const name = availableSpells[i]
+    //     const x = padding + (num % columns + 1) * (btnW + padding)
+    //     const y = padding + Math.floor(num / columns) * (btnH+padding)
+    //     addUI(x, y, btnW, btnH, name, () => { 
+    //         const index = selectedSpellIds.indexOf(num);
+    //         if (index > -1) {
+    //             selectedSpellIds.splice(index, 1);
+    //         }
+    //         else {
+    //             selectedSpellIds.push(num)
+    //         }
+    //         selectSpells()
+    //      })
+    // }
     draw()
 }
 
@@ -485,6 +523,9 @@ async function getAvailableGames()
         const response = await axios.get(url + "/AvailableGames")
         availableGames = response.data.games
         availableSpells = response.data.availableSpells
+        spellTypes = response.data.spellTypes
+        //console.log(spellTypes)
+        //console.log(availableSpells)
     } catch (error) {
         console.log(error)
     }
@@ -597,7 +638,7 @@ function createSpellUI()
     const yOffset = 1.0 - spellUISize
     for (var i = 0; i < selectedSpellIds.length; i++) {
         const num = i
-        const txt = [availableSpells[selectedSpellIds[i]], "0"]
+        const txt = [availableSpells[selectedSpellIds[i]].name, "0"]
         const x = xOffset + spellUISize * i + spellUIPadding
         const size = spellUISize - spellUIPadding * 2
         spellCooldownButtons.push(addUI(x, yOffset + spellUIPadding, size, size, txt, onClick = () => { selectSpellToCast(num) }, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)"))
