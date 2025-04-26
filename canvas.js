@@ -54,6 +54,27 @@ function drawPixelatedImage(img, x, y, w, h, angle = 0)
     context.restore()
 }
 
+function drawColorGradedImage(img, x, y, w, h, angle, col)
+{
+    context.save()
+    context.imageSmoothingEnabled = false;
+    //context.drawImage(img, x - w/2, y - h/2, w, h);
+    context.translate(x, y);
+    context.rotate(angle);
+    context.drawImage(img, 0, 0, img.width, img.height, -w/2,  -h/2, w, h)
+    context.globalCompositeOperation = "multiply";
+
+    context.fillStyle = "rgb("+col+")"
+    context.beginPath();
+    context.ellipse(0,  0, w, h, 0, 0, 2 * Math.PI)
+    context.fill();
+
+    //context.fillStyle = 'rgb('+col+')';
+    //context.fillRect(x, y, w, h);
+    context.imageSmoothingEnabled = true;
+    context.restore()
+}
+
 function switchBuffer()
 {
     //extraContext.drawImage(extraCanvas, 0, 0)

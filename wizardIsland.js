@@ -1,5 +1,5 @@
-const url = "https://localhost:7198"
-//const url = "https://wizardislandrestapi.azurewebsites.net/"
+//const url = "https://localhost:7198"
+const url = "https://wizardislandrestapi.azurewebsites.net/"
 
 var playerId = -1
 var playerPassword = ""
@@ -44,6 +44,7 @@ async function start()
 }
 
 function loadImages() {
+    spriteDictionary["Wizard"] = loadOneImage("Wizard")
     spriteDictionary["FireBall"] = loadOneImage("FireBall")
     spriteDictionary["HomingBolt"] = loadOneImage("HomingBolt")
     spriteDictionary["FrostField"] = loadOneImage("FrostField")
@@ -58,6 +59,7 @@ function loadImages() {
 function loadOneImage(name) {
     const img = new Image();
     img.src = "res/" + name + ".png"
+    //await img
     return img
 }
 
@@ -320,10 +322,12 @@ function draw()
             context.ellipse(x - outlineWidth / 2, y - outlineWidth / 2, size * scale.x + outlineWidth * scale.x, size * scale.y + outlineWidth * scale.y, 0, 0, 2 * Math.PI)
             context.fill();
 
-            context.fillStyle = "rgb(" + player.color + ")"
+            //context.fillStyle = "rgb(" + player.color + ")"
+            context.fillStyle = "rgb(255,255,255)" // for the outline
             context.beginPath();
             context.ellipse(x, y, size * scale.x, size * scale.y, 0, 0, 2 * Math.PI)
             context.fill();
+            drawColorGradedImage(spriteDictionary["Wizard"], x, y, size * scale.x, size * scale.y, 0, player.color)
             // draw health
             const healthOffset = size + 10
             context.fillStyle = "rgba(0, 0, 0, 100)"
