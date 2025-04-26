@@ -611,6 +611,7 @@ async function getGameUpdate()
 function updateSpellUI() 
 {
     for (var i = 0; i < selectedSpellIds.length; i++) {
+        const name = gameData.yourSpells[i].spellName
         var spellIsReady = gameData.yourSpells[i].cooldownRemaining / gameTicksPerSecond
         var ready = false
         if (spellIsReady < 0)
@@ -620,6 +621,7 @@ function updateSpellUI()
         }
         else 
             spellIsReady = spellIsReady.toFixed(2)
+        spellCooldownButtons[i].text[0] = name
         spellCooldownButtons[i].text[1] = spellIsReady
         if (spellToCast == i)
             spellCooldownButtons[i].backgroundColor = "rgb(0, 255, 0)"
