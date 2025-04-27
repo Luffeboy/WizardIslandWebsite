@@ -652,6 +652,6 @@ function createSpellUI()
         const txt = [availableSpells[selectedSpellIds[i]].name, "0"]
         const x = xOffset + spellUISize * i + spellUIPadding
         const size = spellUISize - spellUIPadding * 2
-        spellCooldownButtons.push(addUI(x, yOffset + spellUIPadding, size, size, txt, onClick = () => { selectSpellToCast(num) }, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)"))
+        spellCooldownButtons.push(addUI(x, yOffset + spellUIPadding, size, size, txt, onClick = () => { var hasQuickCast = quickCast; quickCast = false; selectSpellToCast(num); quickCast = hasQuickCast; }, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)"))
     }
 }
