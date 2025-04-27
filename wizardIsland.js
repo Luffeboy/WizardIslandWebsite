@@ -59,6 +59,7 @@ function loadImages() {
     spriteDictionary["BloodWormTail"] = loadOneImage("BloodWormTail")
     spriteDictionary["BloodWormBody"] = loadOneImage("BloodWormBody")
     spriteDictionary["BloodWormHead"] = loadOneImage("BloodWormHead")
+    spriteDictionary["RailgunPartical"] = loadOneImage("RailgunPartical")
 }
 function loadOneImage(name) {
     const img = new Image();
