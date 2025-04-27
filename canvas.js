@@ -23,11 +23,31 @@ function getCanvas()
 
     windowResized(null);
     canvas.addEventListener("click", clickedOnPage)
-    canvas.addEventListener("mousemove", (event) => { MousePosition.x = event.layerX; MousePosition.y = event.layerY });
+    canvas.addEventListener("mousemove", mouseMoved);
     window.addEventListener("keydown", keyboardDown)
     window.addEventListener("keyup", keyboardUp)
     window.addEventListener("resize", windowResized);
     document.addEventListener('contextmenu', event => event.preventDefault());
+}
+
+function mouseMoved(event) 
+{
+    
+    MousePosition.x = event.layerX
+    MousePosition.y = event.layerY
+
+    // // check ui for hover
+    const prevHoveringElement = hoveringUIElement
+    hoveringUIElement = null
+    hoveringUIElement = getUIElementAt(MousePosition);
+
+    if (hoveringUIElement != prevHoveringElement)
+        if (prevHoveringElement != null && prevHoveringElement.endHover != null)
+            prevHoveringElement.endHover()
+    
+
+    if (hoveringUIElement != null && hoveringUIElement.onHover != null)
+        hoveringUIElement.onHover({x: (MousePosition.x / screenWidth - hoveringUIElement.x) / hoveringUIElement.w, y: (MousePosition.y / screenHeight - hoveringUIElement.y) / hoveringUIElement.h})
 }
 
 

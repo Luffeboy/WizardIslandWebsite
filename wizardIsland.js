@@ -1,5 +1,5 @@
-//const url = "https://localhost:7198"
-const url = "https://wizardislandrestapi.azurewebsites.net/"
+const url = "https://localhost:7198"
+//const url = "https://wizardislandrestapi.azurewebsites.net/"
 
 var playerId = -1
 var playerPassword = ""
@@ -190,14 +190,75 @@ function selectSpells()
     // show currently selected spells
     {
         const spellCount = selectedSpellIds.length
-        const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
-        var spellNames = []
+        //const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
+        const amountToSide = .3
         for (var i = 0; i < spellCount; i++)
-            spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]].name)
-        addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
+        {
+            const index = i
+            addUI(padding, padding * 2 + btnH + (btnH + padding/4) * i, btnW, btnH, availableSpells[selectedSpellIds[i]].name, (mp) => 
+                {
+                    const selectedSpellIdsIndex = selectedSpellIds[index]
+                    
+                    if (mp.y < amountToSide)
+                    {
+                        if (index > 0)
+                        {
+                            selectedSpellIds[index] = selectedSpellIds[index - 1]
+                            selectedSpellIds[index - 1] = selectedSpellIdsIndex
+                        }
+                        
+                    }
+                    else if (mp.y > 1-amountToSide)
+                    {
+                        if (index < selectedSpellIds.length - 1)
+                        {
+                            selectedSpellIds[index] = selectedSpellIds[index + 1]
+                            selectedSpellIds[index + 1] = selectedSpellIdsIndex
+                        }
+                    }
+                    else if (mp.x < amountToSide)
+                    {
+                        selectedSpellIds.splice(index, 1);
+                    }
+                    selectSpells()
+                  }, "rgb(0, 0, 0)", "rgb(255, 255, 255)", false, null, (mp) =>
+                    {
+                        var text = null
+                        var col = ""
+                        if (mp.y < amountToSide)
+                        {
+                            col = "0,255,0"
+                            if (index > 0)
+                                text = "Move up"
+                        } else if (mp.y > 1-amountToSide)
+                        {
+                            col = "0,255,0"
+                            if (index < selectedSpellIds.length - 1)
+                                text = "Move down"
+                        } else if (mp.x < amountToSide)
+                        {
+                            col = "255,0,0"
+                            text = "Remove"
+                        }
+                        draw()
+                        if (text)
+                        {
+                            context.fillStyle = "rgb(" + col + ")"
+                            context.fillText(text, MousePosition.x, MousePosition.y - (textHeight + 5))
+                        }
+                    }, null)
+        }
+            //spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]].name)
+        //addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
     }
-
-    //currentlyLookingAtSpellsOfType
+    // {
+    //     const spellCount = selectedSpellIds.length
+    //     const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
+    //     var spellNames = []
+    //     for (var i = 0; i < spellCount; i++)
+    //         spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]].name)
+    //     addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
+    // }
 
     for (var i = 0; i < spellTypes.length; i++)
     {

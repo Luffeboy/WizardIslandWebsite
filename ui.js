@@ -1,9 +1,10 @@
 UIOffSet = { x: 0,y: 0 }
 AllUI = []
 var selectedUIElement = null
+var hoveringUIElement = null
 class UIButton
 {
-    constructor(x, y, w, h, text, onClick, backgroundColor, textColor, isInteractable, onKeyPress){
+    constructor(x, y, w, h, text, onClick, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover){
         this.x = x
         this.y = y
         this.w = w
@@ -14,6 +15,8 @@ class UIButton
         this.textColor = textColor
         this.isInteractable = isInteractable
         this.onKeyPress = onKeyPress
+        this.onHover = onHover
+        this.endHover = endHover
     }
 }
 function clearUIButtons()
@@ -21,7 +24,7 @@ function clearUIButtons()
     AllUI = []
     UIOffSet = { x: 0,y: 0 }
 }
-function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)", isInteractable = false, onKeyPress = null)
+function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)", isInteractable = false, onKeyPress = null, onHover = null, endHover = null)
 {
     if (!Array.isArray(text)) {
         text = [text]
@@ -29,7 +32,7 @@ function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)
     fn = onClick
     if (fn != null && fn.length == 0)
         fn = (mp) => {onClick()}
-    const btn = new UIButton(x, y, w, h, text, fn, backgroundColor, textColor, isInteractable, onKeyPress)
+    const btn = new UIButton(x, y, w, h, text, fn, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover)
     AllUI.push(btn)
     return btn // if you want to use it for something :)
 }
@@ -78,4 +81,19 @@ function clickedOnButton(mousePos)
         }
     }
     return false
+}
+function getUIElementAt(mousePos)
+{
+    mousePos = { x: (mousePos.x - UIOffSet.x) / screenWidth, y: (mousePos.y - UIOffSet.y) / screenHeight }
+    // see if a button is pressed
+    for (var i = 0; i < AllUI.length; i++)
+    {
+        const uiElement = AllUI[i]
+        const x = uiElement.x + UIOffSet.x
+        const y = uiElement.y + UIOffSet.y
+        if (mousePos.x > x && mousePos.x < x + uiElement.w && mousePos.y > y && mousePos.y < y + uiElement.h)
+            return uiElement
+        
+    }
+    return null
 }
