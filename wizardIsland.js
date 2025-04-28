@@ -34,6 +34,7 @@ var myColor = {r:Math.floor(Math.random() * 150), g:Math.floor(Math.random() * 1
 var framesSinceLastDataRecieved = 0
 
 const spriteDictionary = {}
+const debuffSpriteDictionary = {}
 
 var playerStats = []
 
@@ -60,6 +61,11 @@ function loadImages() {
     spriteDictionary["BloodWormBody"] = loadOneImage("BloodWormBody")
     spriteDictionary["BloodWormHead"] = loadOneImage("BloodWormHead")
     spriteDictionary["RailgunPartical"] = loadOneImage("RailgunPartical")
+
+    const debuffs = ["Invulnerability", "Shackled", "Slowed", "Speed"]
+    for (var i = 0; i < debuffs.length; i++)
+        debuffSpriteDictionary[debuffs[i]] = loadOneImage("debuffs/"+debuffs[i])
+
 }
 function loadOneImage(name) {
     const img = new Image();
@@ -396,14 +402,27 @@ function draw()
             drawColorGradedImage(spriteDictionary["Wizard"], x, y, size * scale.x, size * scale.y, 0, player.color)
             // draw health
             const healthOffset = size + 10
+            const healthYSize = size * scale.y / 2
             context.fillStyle = "rgba(0, 0, 0, 100)"
-            context.fillRect(x - size * scale.x, y + healthOffset, size * scale.x * 2, size * scale.y / 2)
+            context.fillRect(x - size * scale.x, y + healthOffset, size * scale.x * 2, healthYSize)
             context.fillStyle = "rgba(255, 0, 0, 100)"
             const currentHealth = player.health / player.maxHealth
-            context.fillRect(x - size * scale.x, y + healthOffset, size * scale.x * 2 * currentHealth, size * scale.y / 2)
+            context.fillRect(x - size * scale.x, y + healthOffset, size * scale.x * 2 * currentHealth, healthYSize)
             // draw name
             context.fillStyle = "rgba(255,255,255)"
             context.fillText(player.name, x - context.measureText(player.name).width / 2, y - size * scale.y - 10)
+            // draw debuffs
+            const debuffCount = player.debuffs.length
+            const debuffSize = 25;
+            for (var j = 0; j < debuffCount; j++) {
+                const debuff = player.debuffs[j]
+                if (debuffSpriteDictionary[debuff])
+                {
+                    const debuffX = x + (j - debuffCount/2 + .5) * debuffSize
+                    const debuffY = y + healthOffset + healthYSize
+                    drawPixelatedImage(debuffSpriteDictionary[debuff], debuffX, debuffY + debuffSize / 2, debuffSize, debuffSize)
+                }
+            }
         }
         // game progress and stats
         {
