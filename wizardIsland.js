@@ -255,17 +255,7 @@ function selectSpells()
                         }
                     }, null)
         }
-            //spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]].name)
-        //addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
     }
-    // {
-    //     const spellCount = selectedSpellIds.length
-    //     const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
-    //     var spellNames = []
-    //     for (var i = 0; i < spellCount; i++)
-    //         spellNames.push((i+1) + ": " +availableSpells[selectedSpellIds[i]].name)
-    //     addUI(padding, padding * 2 + btnH, btnW, showCurrentSpellsHeight, spellNames, () => {  })
-    // }
 
     for (var i = 0; i < spellTypes.length; i++)
     {
@@ -299,25 +289,6 @@ function selectSpells()
             selectSpells()
          })
     }
-
-
-    // for (var i = 0; i < availableSpells.length; i++)
-    // {
-    //     const num = i
-    //     const name = availableSpells[i]
-    //     const x = padding + (num % columns + 1) * (btnW + padding)
-    //     const y = padding + Math.floor(num / columns) * (btnH+padding)
-    //     addUI(x, y, btnW, btnH, name, () => { 
-    //         const index = selectedSpellIds.indexOf(num);
-    //         if (index > -1) {
-    //             selectedSpellIds.splice(index, 1);
-    //         }
-    //         else {
-    //             selectedSpellIds.push(num)
-    //         }
-    //         selectSpells()
-    //      })
-    // }
     draw()
 }
 
@@ -454,8 +425,6 @@ function draw()
     }
     // draw UI
     drawUI()
-
-    //switchBuffer()
 }
 
 function clickedOnPage(event)
@@ -469,7 +438,6 @@ function clickedOnPage(event)
     const mousePosWorld = { x: mousePos.x * cameraView.x / screenWidth  + cameraPos.x - cameraView.x / 2, 
                             y: mousePos.y * cameraView.y / screenHeight + cameraPos.y - cameraView.y / 2 }
     // cast spell?
-    //console.log("Casting spell: " + spellToCast)
     if (spellToCast != -1)
     {
         castSpell(spellToCast, mousePosWorld)
