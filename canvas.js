@@ -12,6 +12,8 @@ function getCanvas()
 {
     canvas = document.getElementById("gameFrame")
     context = canvas.getContext("2d")
+    extraCanvas = document.createElement("canvas");
+    extraContext = extraCanvas.getContext("2d")
     windowResized(null);
     canvas.addEventListener("click", clickedOnPage)
     canvas.addEventListener("mousemove", mouseMoved);
@@ -19,6 +21,7 @@ function getCanvas()
     window.addEventListener("keyup", keyboardUp)
     window.addEventListener("resize", windowResized);
     document.addEventListener('contextmenu', event => event.preventDefault());
+
 }
 
 function mouseMoved(event) 
@@ -51,6 +54,7 @@ function windowResized(event)
     textHeight = screenHeight / 50
     if (textHeight < 10) textHeight = 10 // min size
     context.font = textHeight + "px serif"
+    //extraContext.font = textHeight + "px serif"
     draw()
 }
 
@@ -80,4 +84,14 @@ function drawColorGradedImage(img, x, y, w, h, angle, col)
     context.fill();
     context.imageSmoothingEnabled = true;
     context.restore()
+}
+/// returns the image created
+function drawOnExtraCanvas(w, h, func)
+{
+    //extraContext.clearRect(0,0,w,h)
+    extraCanvas.width = w
+    extraCanvas.height = h
+    extraContext.font = context.font
+    func(extraContext)
+    return extraCanvas
 }

@@ -10,6 +10,7 @@ var mapData = null
 var gameData = null
 var gameDuration = 1
 var gameTicksPerSecond = 30
+var eventDurationInTicks = 30*30
 
 var cameraPos = {x:0, y: 0}
 var cameraView = {x:100, y: 56.25}
@@ -400,15 +401,50 @@ function draw()
             context.fillStyle = "rgb(255, 255, 255)"
             var txt = Math.floor(gameTick / gameDuration * 100) + "% match complete"
             var textSize = context.measureText(txt)
-            context.fillText(txt,
-                screenWidth / 2 - textSize.width / 2,
-                20)
-            // current event
-            txt = "Current event: " + gameData.event.name;
-            textSize = context.measureText(txt)
-            context.fillText(txt,
-                screenWidth / 2 - textSize.width / 2,
-                40)
+            context.fillText(txt, screenWidth / 2 - textSize.width / 2, 20)
+            // event progress
+            {
+                const middlePos = {x:screenWidth / 2, y:20}
+                const progress = (gameTick % eventDurationInTicks) / eventDurationInTicks
+                const invertedProgress = 1 - progress
+                const padding = 5
+                txt = "Current event: " + gameData.event.name;
+                textSize = context.measureText(txt).width
+                nextEventTxt = "Next event: " + gameData.nextEvent.name
+                NextEventTextSize = context.measureText(nextEventTxt).width
+                var eventBoxW = screenWidth / 6
+                if (eventBoxW < textSize + padding * 2) eventBoxW = textSize + padding * 2
+                if (eventBoxW < NextEventTextSize + padding * 2) eventBoxW = NextEventTextSize + padding * 2
+                const eventBoxX = middlePos.x - eventBoxW / 2
+                const eventBoxY = middlePos.y + padding
+                const eventBoxH = 10 + textHeight + padding * 2
+                const eventBoxNewW = eventBoxW * progress
+                //const eventBoxCurrentW = eventBoxW * invertedProgress
+                // draw background
+                context.fillStyle = "rgb(0, 255, 0)"
+                context.fillRect(eventBoxX, eventBoxY, eventBoxW, eventBoxH)
+                // 
+                // var textProgression = easeInOutSineWithPow(progress,.75)
+                // current event
+                context.fillStyle = "rgb(255, 255, 255)"
+                const eventTxtPos = eventBoxX + eventBoxW - padding - textSize
+                context.fillText(txt, eventTxtPos, eventBoxY + eventBoxH / 2 + textHeight / 4)
+                // next event
+
+                if (eventBoxNewW > 5)// the reason we do this, is so we can cut part of the text
+                    context.drawImage(
+                        drawOnExtraCanvas(eventBoxNewW, eventBoxH+2, (ctx) => {
+                        ctx.fillStyle = "rgb(255, 0, 0)"
+                        ctx.fillRect(0, 0, eventBoxNewW, eventBoxH+10)
+                        ctx.fillStyle = "rgb(255, 255, 255)"
+                        ctx.fillText(nextEventTxt, 0,eventBoxH/2+textHeight/4)
+                    }), eventBoxX-1, eventBoxY-1)
+                // middle
+                const eventMiddleW = 5
+                const eventMiddleH = 5
+                context.fillStyle = "rgb("+(255*progress)+","+(255*invertedProgress)+", 0)"
+                context.fillRect(eventBoxX+eventBoxNewW-eventMiddleW/2,eventBoxY-eventMiddleH/2,eventMiddleW,eventBoxH+eventMiddleH)
+            }
             // kills text
             txt = gameData.players[playerId].kills + " kills"
             textSize = context.measureText(txt)
@@ -633,6 +669,7 @@ async function joinGame(gameToJoinId)
         cameraPos.y = mapData.groundMiddle.y
         selectedSpellIds = response.data.yourSpells
         gameDuration = response.data.gameDuration
+        eventDurationInTicks = response.data.eventDuration
         removeMenuButtons()
         createSpellUI()
         update()
