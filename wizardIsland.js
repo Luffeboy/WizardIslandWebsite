@@ -254,7 +254,7 @@ function selectSpells()
                             context.fillStyle = "rgb(" + col + ")"
                             context.fillText(text, MousePosition.x, MousePosition.y - (textHeight + 5))
                         }
-                    }, null)
+                    }, ()=>{draw()})
         }
     }
 
@@ -445,6 +445,7 @@ function draw()
                 context.fillStyle = "rgb("+(255*progress)+","+(255*invertedProgress)+", 0)"
                 context.fillRect(eventBoxX+eventBoxNewW-eventMiddleW/2,eventBoxY-eventMiddleH/2,eventMiddleW,eventBoxH+eventMiddleH)
             }
+            context.fillStyle = "rgb(255,255,255)"
             // kills text
             txt = gameData.players[playerId].kills + " kills"
             textSize = context.measureText(txt)
