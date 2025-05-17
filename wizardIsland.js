@@ -63,7 +63,7 @@ function loadImages() {
     spriteDictionary["BloodWormHead"] = loadOneImage("BloodWormHead")
     spriteDictionary["RailgunPartical"] = loadOneImage("RailgunPartical")
 
-    const debuffs = ["Invulnerability", "Shackled", "Slowed", "Speed"]
+    const debuffs = ["Invulnerability", "Shackled", "Slowed", "Speed", "Brick"]
     for (var i = 0; i < debuffs.length; i++)
         debuffSpriteDictionary[debuffs[i]] = loadOneImage("debuffs/"+debuffs[i])
 
