@@ -1,5 +1,5 @@
-const url = "https://localhost:7198"
-//const url = "https://wizardislandrestapi.azurewebsites.net/"
+//const url = "https://localhost:7198"
+const url = "https://wizardislandapi.jeppejeppsson.dk"
 
 var playerId = -1
 var playerPassword = ""
