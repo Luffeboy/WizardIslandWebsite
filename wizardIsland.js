@@ -99,7 +99,8 @@ function reset()
     gameId = -1
     availableGames = []
     gameData = null
-    start()
+    window.onbeforeunload = null
+    getAvailableGames()
 }
 function moveCamera() {
     if (heldCameraMovementButtons[0])
@@ -659,7 +660,7 @@ async function joinGame(gameToJoinId)
         selectedSpellIds.push(i)
     UIOffSet.x = 1
     try {
-        const bodyData = { spells: selectedSpellIds, name: myName, color: myColor.r + "," + myColor.g + "," + myColor.b  } //JSON.stringify
+        const bodyData = { spells: selectedSpellIds, name: myName, color: myColor.r + "," + myColor.g + "," + myColor.b  }
         const response = await axios.post(url + "/Join/" + gameToJoinId, bodyData, { headers: {'Content-Type': 'application/json'}})
         console.log("game data: " + response.data)
         gameId = gameToJoinId
@@ -671,6 +672,10 @@ async function joinGame(gameToJoinId)
         selectedSpellIds = response.data.yourSpells
         gameDuration = response.data.gameDuration
         eventDurationInTicks = response.data.eventDuration
+        
+        window.onbeforeunload = function() {
+            return true;
+        };
         removeMenuButtons()
         createSpellUI()
         update()
