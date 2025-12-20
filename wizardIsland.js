@@ -39,6 +39,8 @@ const debuffSpriteDictionary = {}
 
 var playerStats = []
 
+var webSocket = null
+
 async function start()
 {
     loadImages()
@@ -75,22 +77,6 @@ function loadOneImage(name) {
     return img
 }
 
-async function update()
-{
-    if (await getGameUpdate())
-    {
-        moveCamera()
-        draw()
-        update()
-        framesSinceLastDataRecieved = 0
-    }
-    else
-    {
-        if (framesSinceLastDataRecieved++ > 10) // we need to not get gameData, for 10 updates in a row, before we disconnect
-            reset()
-        else update()
-    }
-}
 function reset() 
 {
     playerId = -1
@@ -599,22 +585,14 @@ async function move(mousePos)
 }
 async function doAction(actionType, actionData)
 {
-    console.log("Action: " + actionType + JSON.stringify(actionData))
+    if (webSocket == null || webSocket.readyState != WebSocket.OPEN)
+        return
+    //console.log("Action: " + actionType + JSON.stringify(actionData))
     try {
         const packet = {
-            playerId: playerId,
-            password: playerPassword,
-            extraData: actionType + JSON.stringify(actionData)
+            ExtraData: actionType + JSON.stringify(actionData)
         }
-        const response = await fetch(url + "/" + gameId,
-            {
-                method: "POST",
-                body: JSON.stringify(packet),
-                headers: {
-                    "Content-type": "application/json;"
-                }
-            }
-        )
+        webSocket.send(JSON.stringify(packet))
     } catch (error) {
         console.log(error)
         
@@ -629,8 +607,6 @@ async function getAvailableGames()
         availableGames = data.games
         availableSpells = data.availableSpells
         spellTypes = data.spellTypes
-        //console.log(spellTypes)
-        //console.log(availableSpells)
     } catch (error) {
         console.log(error)
     }
@@ -651,6 +627,7 @@ async function createGame()
         // start game button
         addUI(.1, .1, .2, .2, "Start game", () => {startCreatedGame()})
     } catch (error) {
+        console.log(error)
         await getAvailableGames()
     }
     UIOffSet.x = 0
@@ -681,34 +658,14 @@ async function joinGame(gameToJoinId)
         selectedSpellIds.push(i)
     UIOffSet.x = 1
     try {
-        const bodyData = { spells: selectedSpellIds, name: myName, color: myColor.r + "," + myColor.g + "," + myColor.b  }
-        const response = await fetch(url + "/Join/" + gameToJoinId,
-            {
-                method: "POST",
-                body: JSON.stringify(bodyData),
-                headers: {
-                    "Content-type": "application/json;"
-                }
-            }
-        )
-        const data = await response.json()
-        //console.log(data)
         gameId = gameToJoinId
-        playerId = data.id
-        playerPassword = data.password
-        mapData = data.map
-        cameraPos.x = mapData.groundMiddle.x
-        cameraPos.y = mapData.groundMiddle.y
-        selectedSpellIds = data.yourSpells
-        gameDuration = data.gameDuration
-        eventDurationInTicks = data.eventDuration
-        
+        webSocket = new WebSocket(url + "/joinGame?id="+gameToJoinId)
+        setupWebsocket()
         window.onbeforeunload = function() {
             return true;
         };
         removeMenuButtons()
         createSpellUI()
-        update()
     } catch (error) {
         gameId = -1
         console.log(error)
@@ -716,31 +673,51 @@ async function joinGame(gameToJoinId)
     UIOffSet.x = 0
 }
 
-async function getGameUpdate()
+function setupWebsocket()
 {
-    //gameData = null
-    try {
-        const response = await fetch(url + "/" + gameId,
-            {
-                headers: {
-                    'playerId': playerId,
-                    'password': playerPassword,
-                    'gameTick': gameTick
-                }
-            }
-        )
-        
-        gameData = await response.json()
+    // Connection opened
+    webSocket.addEventListener("open", (event) => {
+        const bodyData = { Spells: selectedSpellIds, Name: myName, Color: myColor.r + "," + myColor.g + "," + myColor.b  }
+        webSocket.send(JSON.stringify(bodyData))
+    })
+
+    // Listen for messages
+    var isThisTheFirstMessage = true
+    webSocket.addEventListener("message", (event) => 
+    {
+        var data = JSON.parse(event.data)
+        //console.log(data)
+        if (isThisTheFirstMessage)
+        {
+            playerId = data.id
+            playerPassword = data.password
+            mapData = data.map
+            cameraPos.x = mapData.groundMiddle.x
+            cameraPos.y = mapData.groundMiddle.y
+            selectedSpellIds = data.yourSpells
+            gameDuration = data.gameDuration
+            eventDurationInTicks = data.eventDuration
+            isThisTheFirstMessage = false
+            return
+        }
+        if (data.ended)
+        {
+            webSocket.send("Ok, I will go")
+            return
+        }
+        gameData = data
         playerStats = gameData.players
         gameTick = gameData.gameTick
         mapData = gameData.map
+        moveCamera()
         updateSpellUI()
-        return true
-    } catch (error) {
-        gameData = null
-        console.log("Error: \n" + error)
-    }
-    return false
+        draw()
+    })
+    webSocket.addEventListener("close", (event) => 
+    {
+        webSocket = null
+        reset()
+    })
 }
 
 function updateSpellUI() 
