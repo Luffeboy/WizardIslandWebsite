@@ -1,5 +1,5 @@
-//const url = "https://localhost:7198"
-const url = "https://wizardislandapi.jeppejeppsson.dk"
+const url = "https://localhost:7198"
+//const url = "https://wizardislandapi.jeppejeppsson.dk"
 
 var playerId = -1
 var playerPassword = ""
@@ -606,7 +606,15 @@ async function doAction(actionType, actionData)
             password: playerPassword,
             extraData: actionType + JSON.stringify(actionData)
         }
-        const response = await axios.post(url + "/" + gameId, packet)
+        const response = await fetch(url + "/" + gameId,
+            {
+                method: "POST",
+                body: JSON.stringify(packet),
+                headers: {
+                    "Content-type": "application/json;"
+                }
+            }
+        )
     } catch (error) {
         console.log(error)
         
@@ -616,10 +624,11 @@ async function doAction(actionType, actionData)
 async function getAvailableGames()
 {
     try {
-        const response = await axios.get(url + "/AvailableGames")
-        availableGames = response.data.games
-        availableSpells = response.data.availableSpells
-        spellTypes = response.data.spellTypes
+        const response = await fetch(url + "/AvailableGames")
+        var data = await response.json()
+        availableGames = data.games
+        availableSpells = data.availableSpells
+        spellTypes = data.spellTypes
         //console.log(spellTypes)
         //console.log(availableSpells)
     } catch (error) {
@@ -632,8 +641,12 @@ async function createGame()
 {
     UIOffSet.x = 1
     try {
-        const response = await axios.post(url + "/CreateGame")
-        const location = response.headers["location"].substring(1)
+        const response = await fetch(url + "/CreateGame",
+            {
+                method: "POST"
+            }
+        )
+        const location = response.headers.get("location").substring(1)
         await joinGame(location)
         // start game button
         addUI(.1, .1, .2, .2, "Start game", () => {startCreatedGame()})
@@ -645,7 +658,15 @@ async function createGame()
 async function startCreatedGame()
 {
     try {
-        const response = await axios.post(url + "/StartGame/" + gameId, JSON.stringify(playerPassword), { headers: {'Content-Type': 'application/json'} })
+        const response = await fetch(url + "/StartGame/" + gameId,
+            {
+                method: "POST",
+                body: JSON.stringify(playerPassword),
+                headers: {
+                    "Content-type": "application/json;"
+                }
+            }
+        )
         removeMenuButtons()
         createSpellUI()
     } catch (error) {
@@ -661,17 +682,26 @@ async function joinGame(gameToJoinId)
     UIOffSet.x = 1
     try {
         const bodyData = { spells: selectedSpellIds, name: myName, color: myColor.r + "," + myColor.g + "," + myColor.b  }
-        const response = await axios.post(url + "/Join/" + gameToJoinId, bodyData, { headers: {'Content-Type': 'application/json'}})
-        console.log("game data: " + response.data)
+        const response = await fetch(url + "/Join/" + gameToJoinId,
+            {
+                method: "POST",
+                body: JSON.stringify(bodyData),
+                headers: {
+                    "Content-type": "application/json;"
+                }
+            }
+        )
+        const data = await response.json()
+        //console.log(data)
         gameId = gameToJoinId
-        playerId = response.data.id
-        playerPassword = response.data.password
-        mapData = response.data.map
+        playerId = data.id
+        playerPassword = data.password
+        mapData = data.map
         cameraPos.x = mapData.groundMiddle.x
         cameraPos.y = mapData.groundMiddle.y
-        selectedSpellIds = response.data.yourSpells
-        gameDuration = response.data.gameDuration
-        eventDurationInTicks = response.data.eventDuration
+        selectedSpellIds = data.yourSpells
+        gameDuration = data.gameDuration
+        eventDurationInTicks = data.eventDuration
         
         window.onbeforeunload = function() {
             return true;
@@ -681,6 +711,7 @@ async function joinGame(gameToJoinId)
         update()
     } catch (error) {
         gameId = -1
+        console.log(error)
     }
     UIOffSet.x = 0
 }
@@ -689,13 +720,17 @@ async function getGameUpdate()
 {
     //gameData = null
     try {
-        const response = await axios.get(url + "/" + gameId, {
-        headers: {
-            'playerId': playerId,
-            'password': playerPassword,
-            'gameTick': gameTick
-        }})
-        gameData = response.data
+        const response = await fetch(url + "/" + gameId,
+            {
+                headers: {
+                    'playerId': playerId,
+                    'password': playerPassword,
+                    'gameTick': gameTick
+                }
+            }
+        )
+        
+        gameData = await response.json()
         playerStats = gameData.players
         gameTick = gameData.gameTick
         mapData = gameData.map
