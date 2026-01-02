@@ -1,5 +1,6 @@
 const url = "https://localhost:7198"
 //const url = "https://wizardislandapi.jeppejeppsson.dk"
+const isDebugging = url == "https://localhost:7198"
 
 var playerId = -1
 var playerPassword = ""
@@ -40,6 +41,7 @@ const debuffSpriteDictionary = {}
 var playerStats = []
 
 var webSocket = null
+const spellUISize = .1
 
 async function start()
 {
@@ -661,6 +663,7 @@ async function joinGame(gameToJoinId)
         gameId = gameToJoinId
         webSocket = new WebSocket(url + "/joinGame?id="+gameToJoinId)
         setupWebsocket()
+        if (!isDebugging)
         window.onbeforeunload = function() {
             return true;
         };
@@ -723,31 +726,33 @@ function setupWebsocket()
 function updateSpellUI() 
 {
     for (var i = 0; i < selectedSpellIds.length; i++) {
-        const name = gameData.yourSpells[i].spellName
+        const name = gameData.yourSpells[i].spellName.split("\n");
         var spellIsReady = gameData.yourSpells[i].cooldownRemaining / gameTicksPerSecond
-        var ready = false
-        if (spellIsReady < 0)
-        {
+        var ready = spellIsReady < 0
+        if (ready)
             spellIsReady = "Ready"
-            ready = true
-        }
         else 
             spellIsReady = spellIsReady.toFixed(2)
-        spellCooldownButtons[i].text[0] = name
-        spellCooldownButtons[i].text[1] = spellIsReady
+        spellCooldownButtons[i].text = name
+        spellCooldownButtons[i].text.push(spellIsReady)
         if (spellToCast == i)
             spellCooldownButtons[i].backgroundColor = "rgb(0, 255, 0)"
         else if (ready)
             spellCooldownButtons[i].backgroundColor = "rgb(0, 100, 0)"
         else
             spellCooldownButtons[i].backgroundColor = "rgb(0, 0, 0)"
+        // fix button height
+        const spellUIPadding = .01
+        const btnMinHeight = textHeight * spellCooldownButtons[i].text.length / screenHeight + 2 * spellUIPadding
+        // spellUISize
+        spellCooldownButtons[i].h = (spellUISize < btnMinHeight) ? btnMinHeight : spellUISize
     }
 }
 
 function createSpellUI()
 {
     spellCooldownButtons = []
-    const spellUISize = .1
+    
     const spellUIPadding = .01
     const xOffset = .5 - (selectedSpellIds.length / 2) * spellUISize
     const yOffset = 1.0 - spellUISize
