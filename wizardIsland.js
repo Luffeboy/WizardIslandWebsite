@@ -49,7 +49,8 @@ async function start()
     await getAvailableGames()
 }
 
-function loadImages() {
+function loadImages() 
+{
     spriteDictionary["Wizard"] = loadOneImage("Wizard")
     spriteDictionary["FireBall"] = loadOneImage("FireBall")
     spriteDictionary["HomingBolt"] = loadOneImage("HomingBolt")
@@ -72,7 +73,8 @@ function loadImages() {
         debuffSpriteDictionary[debuffs[i]] = loadOneImage("debuffs/"+debuffs[i])
 
 }
-function loadOneImage(name) {
+function loadOneImage(name) 
+{
     const img = new Image();
     img.src = "res/" + name + ".png"
     //await img
@@ -90,7 +92,9 @@ function reset()
     window.onbeforeunload = null
     getAvailableGames()
 }
-function moveCamera() {
+
+function moveCamera() 
+{
     if (heldCameraMovementButtons[0])
         cameraPos.x++
     if (heldCameraMovementButtons[1])
@@ -285,8 +289,6 @@ function selectSpells()
 function draw()
 {
     // clear
-    //lavaColor
-    //groundColor
     context.fillStyle = lavaColor
     context.fillRect(0, 0, screenWidth, screenHeight)
     if (gameData)
@@ -585,6 +587,7 @@ async function move(mousePos)
 {
     await doAction(0, mousePos)
 }
+
 async function doAction(actionType, actionData)
 {
     if (webSocket == null || webSocket.readyState != WebSocket.OPEN)
@@ -744,7 +747,6 @@ function updateSpellUI()
         // fix button height
         const spellUIPadding = .01
         const btnMinHeight = textHeight * spellCooldownButtons[i].text.length / screenHeight + 2 * spellUIPadding
-        // spellUISize
         spellCooldownButtons[i].h = (spellUISize < btnMinHeight) ? btnMinHeight : spellUISize
     }
 }
@@ -752,7 +754,6 @@ function updateSpellUI()
 function createSpellUI()
 {
     spellCooldownButtons = []
-    
     const spellUIPadding = .01
     const xOffset = .5 - (selectedSpellIds.length / 2) * spellUISize
     const yOffset = 1.0 - spellUISize
