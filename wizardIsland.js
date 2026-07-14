@@ -43,6 +43,21 @@ var playerStats = []
 var webSocket = null
 const spellUISize = .1
 
+const ActionPacketType =
+{
+    move: 0,
+    spell: 1,
+    selectAugment: 2,
+}
+
+const PacketToClientType =
+{
+    standard: 1,
+    joinedGame: 2,
+    getAugment: 3,
+    gameEnded: 4,
+}
+
 async function start()
 {
     loadImages()
@@ -580,12 +595,12 @@ function selectSpellToCast(spellId)
 }
 async function castSpell(spellId, mousePos)
 {
-    await doAction(1, {spellIndex: spellId, mousePos: mousePos})
+    await doAction(ActionPacketType.spell, {spellIndex: spellId, mousePos: mousePos})
 }
 
 async function move(mousePos)
 {
-    await doAction(0, mousePos)
+    await doAction(ActionPacketType.move, mousePos)
 }
 
 async function doAction(actionType, actionData)
@@ -595,12 +610,11 @@ async function doAction(actionType, actionData)
     //console.log("Action: " + actionType + JSON.stringify(actionData))
     try {
         const packet = {
-            ExtraData: actionType + JSON.stringify(actionData)
+            ExtraData: actionType + ' ' + JSON.stringify(actionData)
         }
         webSocket.send(JSON.stringify(packet))
     } catch (error) {
         console.log(error)
-        
     }
 }
 
@@ -679,6 +693,7 @@ async function joinGame(gameToJoinId)
     UIOffSet.x = 0
 }
 
+
 function setupWebsocket()
 {
     // Connection opened
@@ -688,42 +703,57 @@ function setupWebsocket()
     })
 
     // Listen for messages
-    var isThisTheFirstMessage = true
-    webSocket.addEventListener("message", (event) => 
-    {
-        var data = JSON.parse(event.data)
-        //console.log(data)
-        if (isThisTheFirstMessage)
-        {
-            playerId = data.id
-            playerPassword = data.password
-            mapData = data.map
-            cameraPos.x = mapData.groundMiddle.x
-            cameraPos.y = mapData.groundMiddle.y
-            selectedSpellIds = data.yourSpells
-            gameDuration = data.gameDuration
-            eventDurationInTicks = data.eventDuration
-            isThisTheFirstMessage = false
-            return
-        }
-        if (data.ended)
-        {
-            webSocket.send("Ok, I will go")
-            return
-        }
-        gameData = data
-        playerStats = gameData.players
-        gameTick = gameData.gameTick
-        mapData = gameData.map
-        moveCamera()
-        updateSpellUI()
-        draw()
-    })
+    webSocket.addEventListener("message", RecieveData)
     webSocket.addEventListener("close", (event) => 
     {
         webSocket = null
         reset()
     })
+}
+
+function RecieveData(event)
+{
+    var data = JSON.parse(event.data)
+    if (data.dataType)
+    {
+        const dataType = data.dataType
+        data = data.data
+
+        switch (dataType)
+        {
+            case PacketToClientType.standard:
+                endAugmentPhase()
+                gameData = data
+                playerStats = gameData.players
+                gameTick = gameData.gameTick
+                mapData = gameData.map
+                
+                moveCamera()
+                updateSpellUI()
+                break
+
+            case PacketToClientType.joinedGame:
+                playerId = data.id
+                playerPassword = data.password
+                mapData = data.map
+                cameraPos.x = mapData.groundMiddle.x
+                cameraPos.y = mapData.groundMiddle.y
+                selectedSpellIds = data.yourSpells
+                gameDuration = data.gameDuration
+                eventDurationInTicks = data.eventDuration
+                break
+
+            case PacketToClientType.getAugment:
+                gotAugments(data.augmentData)
+                break
+
+            case PacketToClientType.gameEnded:
+                webSocket = null
+                reset()
+                break
+        }
+    }
+    draw()
 }
 
 function updateSpellUI() 

@@ -19,11 +19,13 @@ class UIButton
         this.endHover = endHover
     }
 }
+
 function clearUIButtons()
 {
     AllUI = []
     UIOffSet = { x: 0,y: 0 }
 }
+
 function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)", isInteractable = false, onKeyPress = null, onHover = null, endHover = null)
 {
     if (!Array.isArray(text)) {
@@ -35,6 +37,18 @@ function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)
     const btn = new UIButton(x, y, w, h, text, fn, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover)
     AllUI.push(btn)
     return btn // if you want to use it for something :)
+}
+
+function removeUI(uiElement)
+{
+    for (var i = 0; i < AllUI.length; i++)
+    {
+        if (AllUI[i] == uiElement)
+        {
+            AllUI.splice(i, 1);
+            break
+        }
+    }
 }
 
 function drawUI()
@@ -57,6 +71,7 @@ function drawUI()
         }
     }
 }
+
 function clickedOnButton(mousePos)
 {
     selectedUIElement = null // reset this, when clicking :)
@@ -82,6 +97,7 @@ function clickedOnButton(mousePos)
     }
     return false
 }
+
 function getUIElementAt(mousePos)
 {
     mousePos = { x: (mousePos.x - UIOffSet.x) / screenWidth, y: (mousePos.y - UIOffSet.y) / screenHeight }
