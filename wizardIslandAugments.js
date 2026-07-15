@@ -33,8 +33,9 @@ function displayAugmentsToChoose(augments)
         augmentsUIButtons.push(addUI(x, y, 
             btnWidth, btnHeight, 
             text, ()=> {
-                 selectedAugmentIndex = augIndex
-                 fixAugmentsUIButtonHighlight()
+                selectedAugmentIndex = augIndex
+                fixAugmentsUIButtonHighlight()
+                draw()
             }))
     }
     fixAugmentsUIButtonHighlight()
@@ -51,6 +52,8 @@ function confirmAugmentChoice()
     {
         doAction(ActionPacketType.selectAugment, selectedAugmentIndex)
         selectedAugmentIndex = -1
+        clearAugmentsUIButtons()
+        draw()
     }
 }
 

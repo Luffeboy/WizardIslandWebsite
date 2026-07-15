@@ -500,6 +500,17 @@ function keyboardDown(event)
             selectedUIElement.onKeyPress(event)
         return
     }
+    // quick disconnect, by tapping "-" 3 times in a row
+    if (event.keyCode == 189)
+    {
+        minusInARowToDisconnect--;
+        console.log(minusInARowToDisconnect)
+        if (minusInARowToDisconnect <= 0)
+            disconnectFromServer()
+        return
+    }
+    minusInARowToDisconnect = minusInARowToDisconnectMax
+
     if (gameId == -1 || event.keyCode < 32 || event.keyCode > 90) // 32 is space, 90 is 'z'
     {
         // not ingame
@@ -552,6 +563,8 @@ function keyboardDown(event)
             return
     }
 }
+const minusInARowToDisconnectMax = 3;
+var minusInARowToDisconnect = minusInARowToDisconnectMax;
 
 function keyboardUp(event)
 {
@@ -706,9 +719,17 @@ function setupWebsocket()
     webSocket.addEventListener("message", RecieveData)
     webSocket.addEventListener("close", (event) => 
     {
-        webSocket = null
-        reset()
+        disconnectFromServer()
     })
+}
+
+function disconnectFromServer()
+{
+    if (webSocket != null)
+        webSocket.close()
+    minusInARowToDisconnect = minusInARowToDisconnectMax
+    webSocket = null
+    reset()
 }
 
 function RecieveData(event)
@@ -748,8 +769,7 @@ function RecieveData(event)
                 break
 
             case PacketToClientType.gameEnded:
-                webSocket = null
-                reset()
+                disconnectFromServer()
                 break
         }
     }
