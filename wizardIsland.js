@@ -48,6 +48,7 @@ const ActionPacketType =
     move: 0,
     spell: 1,
     selectAugment: 2,
+    giveFreeAugment: 3,
 }
 
 const PacketToClientType =
@@ -504,7 +505,6 @@ function keyboardDown(event)
     if (event.keyCode == 189)
     {
         minusInARowToDisconnect--;
-        console.log(minusInARowToDisconnect)
         if (minusInARowToDisconnect <= 0)
             disconnectFromServer()
         return
@@ -560,6 +560,9 @@ function keyboardDown(event)
         case 'w':
         case "ArrowUp":
             heldCameraMovementButtons[3] = true
+            return
+        case "p":
+            doAction(ActionPacketType.giveFreeAugment, " ")
             return
     }
 }
@@ -765,7 +768,7 @@ function RecieveData(event)
                 break
 
             case PacketToClientType.getAugment:
-                gotAugments(data.augmentData)
+                gotAugments(data.augmentData, data.timeRemaining)
                 break
 
             case PacketToClientType.gameEnded:

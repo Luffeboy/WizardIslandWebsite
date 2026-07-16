@@ -1,11 +1,23 @@
 var augmentsYouCanChoose = null
 var augmentsUIButtons = []
 var selectedAugmentIndex = -1
+var augmentTimeRemaining = -1
+var augmentTimeRemainingMax = -1
 
-function gotAugments(augments)
+function gotAugments(augments, timeRemaining)
 {
+    augmentTimeRemaining = timeRemaining
+    if (augments == null)
+    {
+        augmentsUIButtons[0].text = ["Time until resuming: " + augmentTimeRemaining.toFixed(2)]
+        const minTransparency = .1
+        const transparency = Math.min(augmentTimeRemaining / (augmentTimeRemainingMax / 10), 1 - minTransparency) + minTransparency
+        augmentsUIButtons[0].backgroundColor = "rgb(0,0,0,"+(transparency)+")"
+        return
+    }
     if (augmentsYouCanChoose != null)
         return
+    augmentTimeRemainingMax = timeRemaining
     augmentsYouCanChoose = augments
     displayAugmentsToChoose(augmentsYouCanChoose)
 }
@@ -28,6 +40,9 @@ function displayAugmentsToChoose(augments)
         const augIndex = i
         const aug = augments[i]
         const text = [aug.augmentName, "", aug.augmentDescription]
+        for (var j = 0; j < aug.augmentDescription.length; j++)
+            if (aug.augmentDescription[j] == '\n')
+                console.log("Enter at: " + j)
         const x = btnPaddingW + i * widthWithoutPadding
         const y = btnPaddingY//.5 - btnHeight / 2
         augmentsUIButtons.push(addUI(x, y, 
@@ -52,7 +67,7 @@ function confirmAugmentChoice()
     {
         doAction(ActionPacketType.selectAugment, selectedAugmentIndex)
         selectedAugmentIndex = -1
-        clearAugmentsUIButtons()
+        showRemainingAugmentTime()
         draw()
     }
 }
@@ -64,6 +79,19 @@ function fixAugmentsUIButtonHighlight()
     for (var i = 0; i < augmentsUIButtons.length; i++)
         augmentsUIButtons[i].backgroundColor = i == selectedAugmentIndex ? highlightColor : normalColor
     augmentsUIButtons[augmentsUIButtons.length - 1].backgroundColor = selectedAugmentIndex == -1 ? normalColor : highlightColor
+}
+
+function showRemainingAugmentTime()
+{
+    for (var i = 0; i < augmentsUIButtons.length; i++)
+        removeUI(augmentsUIButtons[i])
+    augmentsUIButtons = []
+    const w = .2
+    const h = .1
+
+    augmentsUIButtons.push(addUI(.5 - (w / 2), .5 - (h / 2), 
+                                w, h, 
+                                "Time until resuming: " + augmentTimeRemaining))
 }
 
 function clearAugmentsUIButtons()
