@@ -39,12 +39,29 @@ function displayAugmentsToChoose(augments)
     {
         const augIndex = i
         const aug = augments[i]
-        const text = [aug.augmentName, "", aug.augmentDescription]
-        for (var j = 0; j < aug.augmentDescription.length; j++)
-            if (aug.augmentDescription[j] == '\n')
-                console.log("Enter at: " + j)
+        var text = [aug.augmentName, ""]
+        {
+            // account for enters (\n)
+            var str = ""
+            for (var j = 0; j < aug.augmentDescription.length; j++)
+                if (aug.augmentDescription[j] != '\n')
+                    str += aug.augmentDescription[j]
+                else
+                {
+                    text.push(str)
+                    str = ""
+                }
+            if (str.length > 0)
+                text.push(str)
+        }
+        text.push("")
+        // show a list of effected spells
+        text.push("Effected spells:")
+        for (var j = 0; j < aug.augmentsEffected.length; j++)
+            text.push(aug.augmentsEffected[j])
+
         const x = btnPaddingW + i * widthWithoutPadding
-        const y = btnPaddingY//.5 - btnHeight / 2
+        const y = btnPaddingY
         augmentsUIButtons.push(addUI(x, y, 
             btnWidth, btnHeight, 
             text, ()=> {
