@@ -116,10 +116,16 @@ function moveCamera()
         const myPlayer = gameData.players[playerId]
         const camSpeed = 1/2.5
         const velocityMultiplier = 3
+        const jitterPreventionThreshold = .1
         const targetPos = { x: myPlayer.pos.x + myPlayer.velocity.x * velocityMultiplier, 
                             y: myPlayer.pos.y + myPlayer.velocity.y * velocityMultiplier }
-        cameraPos.x += (targetPos.x - cameraPos.x) * camSpeed
-        cameraPos.y += (targetPos.y - cameraPos.y) * camSpeed
+        if  ((targetPos.x - cameraPos.x) * (targetPos.x - cameraPos.x) +
+            (targetPos.y - cameraPos.y) * (targetPos.y - cameraPos.y)
+            > jitterPreventionThreshold)
+        {
+            cameraPos.x += (targetPos.x - cameraPos.x) * camSpeed
+            cameraPos.y += (targetPos.y - cameraPos.y) * camSpeed
+        }
         return
     }
     if (heldCameraMovementButtons[0])
