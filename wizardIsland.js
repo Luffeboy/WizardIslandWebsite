@@ -395,11 +395,22 @@ function draw()
             const debuffSize = 25;
             for (var j = 0; j < debuffCount; j++) {
                 const debuff = player.debuffs[j]
-                if (debuffSpriteDictionary[debuff])
+                if (debuffSpriteDictionary[debuff.name])
                 {
                     const debuffX = x + (j - debuffCount/2 + .5) * debuffSize
-                    const debuffY = y + healthOffset + healthYSize
-                    drawPixelatedImage(debuffSpriteDictionary[debuff], debuffX, debuffY + debuffSize / 2, debuffSize, debuffSize)
+                    const debuffY = y + healthOffset + healthYSize + debuffSize / 2
+                    drawPixelatedImage(debuffSpriteDictionary[debuff.name], debuffX, debuffY, debuffSize, debuffSize)
+                    if (debuff.stacks > 1)
+                    {
+                        const text = "" + debuff.stacks
+                        const textWidth = context.measureText(text).width
+                        const textHeightTemp = textHeight * 2 / 3
+                        setTextSize(textHeightTemp)
+                        context.fillText(text, 
+                                         debuffX - textWidth / 2, 
+                                         debuffY + textHeightTemp / 2)
+                        resetTextSize()
+                    }
                 }
             }
         }

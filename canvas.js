@@ -44,6 +44,15 @@ function mouseMoved(event)
         hoveringUIElement.onHover({x: (MousePosition.x / screenWidth - hoveringUIElement.x) / hoveringUIElement.w, y: (MousePosition.y / screenHeight - hoveringUIElement.y) / hoveringUIElement.h})
 }
 
+function setTextSize(textSize)
+{
+    context.font = textSize + "px serif"
+}
+
+function resetTextSize()
+{
+    setTextSize(textHeight)
+}
 
 function windowResized(event)
 {
@@ -53,7 +62,7 @@ function windowResized(event)
     canvas.height = screenHeight
     textHeight = screenHeight / 50
     if (textHeight < 10) textHeight = 10 // min size
-    context.font = textHeight + "px serif"
+    resetTextSize()
     //extraContext.font = textHeight + "px serif"
     draw()
 }
