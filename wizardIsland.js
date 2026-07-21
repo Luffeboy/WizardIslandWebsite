@@ -111,6 +111,17 @@ function reset()
 
 function moveCamera() 
 {
+    if (shouldFollowPlayer)
+    {
+        const myPlayer = gameData.players[playerId]
+        const camSpeed = 1/2.5
+        const velocityMultiplier = 3
+        const targetPos = { x: myPlayer.pos.x + myPlayer.velocity.x * velocityMultiplier, 
+                            y: myPlayer.pos.y + myPlayer.velocity.y * velocityMultiplier }
+        cameraPos.x += (targetPos.x - cameraPos.x) * camSpeed
+        cameraPos.y += (targetPos.y - cameraPos.y) * camSpeed
+        return
+    }
     if (heldCameraMovementButtons[0])
         cameraPos.x++
     if (heldCameraMovementButtons[1])
@@ -309,11 +320,6 @@ function draw()
     context.fillRect(0, 0, screenWidth, screenHeight)
     if (gameData)
     {
-        if (shouldFollowPlayer)
-        {
-            cameraPos.x = gameData.players[playerId].pos.x
-            cameraPos.y = gameData.players[playerId].pos.y
-        }
         cameraView.y = cameraView.x * screenHeight / screenWidth
         scale = { x: screenWidth / cameraView.x, y: screenHeight / cameraView.y }
         function getX(x){ return (x - cameraPos.x + cameraView.x / 2) * scale.x }
