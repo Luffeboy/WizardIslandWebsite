@@ -198,7 +198,6 @@ function customize(nameIsSelected = false)
         {
             myName += event.key
         }
-        //customize(true)
         nameBtn.text[1] = myName
         draw()
     }
@@ -208,8 +207,26 @@ function customize(nameIsSelected = false)
     addUI(.35, .6, .1, .1, "", (mp) => { myColor.r = Math.floor(mp.x * 255); customize()  }, "rgb(" + myColor.r + ",0,0)")
     addUI(.50, .6, .1, .1, "", (mp) => { myColor.g = Math.floor(mp.x * 255); customize()  }, "rgb(0," + myColor.g + ",0)")
     addUI(.65, .6, .1, .1, "", (mp) => { myColor.b = Math.floor(mp.x * 255); customize()  }, "rgb(0,0," + myColor.b + ")")
-
-
+    var colorPickerData = null
+    addUI(.80, .6, .1, .1, [], (mp) => {
+        if (colorPickerData == null)
+        {
+            console.log("No color picker data")
+            return
+        }
+        const x = .5 + (mp.x - .5) * colorPickerData.width / colorPickerData.radius / 2
+        const y = .5 + (mp.y - .5) * colorPickerData.height / colorPickerData.radius / 2
+        var col = getColorFromColorPicker(x, y);
+        if (col == null)
+            return
+        myColor.r = col.r
+        myColor.g = col.g
+        myColor.b = col.b
+        customize()
+        }, "rgba(0, 0, 0, 0)", "rgba(255, 255, 255, 0)", false, null, null, null, (x, y, w, h) =>
+        {
+            colorPickerData = drawColorPicker(x + w / 2, y + h / 2, w, h, context)
+        })
     draw()
 }
 

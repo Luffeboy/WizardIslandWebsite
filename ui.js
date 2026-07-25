@@ -4,7 +4,7 @@ var selectedUIElement = null
 var hoveringUIElement = null
 class UIButton
 {
-    constructor(x, y, w, h, text, onClick, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover){
+    constructor(x, y, w, h, text, onClick, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover, additionalDrawFunction){
         this.x = x
         this.y = y
         this.w = w
@@ -17,6 +17,7 @@ class UIButton
         this.onKeyPress = onKeyPress
         this.onHover = onHover
         this.endHover = endHover
+        this.additionalDrawFunction = additionalDrawFunction
     }
 }
 
@@ -26,7 +27,7 @@ function clearUIButtons()
     UIOffSet = { x: 0,y: 0 }
 }
 
-function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)", isInteractable = false, onKeyPress = null, onHover = null, endHover = null)
+function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)", isInteractable = false, onKeyPress = null, onHover = null, endHover = null, additionalDrawFunction = null)
 {
     if (!Array.isArray(text)) {
         text = [text]
@@ -34,7 +35,7 @@ function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)
     fn = onClick
     if (fn != null && fn.length == 0)
         fn = (mp) => {onClick()}
-    const btn = new UIButton(x, y, w, h, text, fn, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover)
+    const btn = new UIButton(x, y, w, h, text, fn, backgroundColor, textColor, isInteractable, onKeyPress, onHover, endHover, additionalDrawFunction)
     AllUI.push(btn)
     return btn // if you want to use it for something :)
 }
@@ -69,6 +70,8 @@ function drawUI()
                 (x + uiElement.w / 2) * screenWidth - textSize.width / 2,
                 (y + uiElement.h / 2) * screenHeight - txtOffset + textHeight * j)
         }
+        if (uiElement.additionalDrawFunction)
+            uiElement.additionalDrawFunction(x * screenWidth, y * screenHeight, uiElement.w * screenWidth, uiElement.h * screenHeight)
     }
 }
 
