@@ -61,6 +61,7 @@ const PacketToClientType =
 
 async function start()
 {
+    readCustomizationFromLocalStorage()
     loadImages()
     await getAvailableGames()
 }
@@ -181,7 +182,7 @@ function createMenuButtons()
     draw()
 }
 
-function customize(nameIsSelected = false)
+function customize()
 {
     clearUIButtons()
     addUI(.1, .1, .2, .1, "Back", () => { createMenuButtons() })
@@ -202,14 +203,13 @@ function customize(nameIsSelected = false)
             myName += event.key
         }
         nameBtn.text[1] = myName
+        saveCustomizationToLocalStorage();
         draw()
     }
-    if (nameIsSelected)
-        selectedUIElement = nameBtn
     addUI(.1, .6, .2, .1, "Color (rgb):", () => {  }, "rgb(" + myColor.r + "," + myColor.g + ","  + myColor.b + ")")
-    addUI(.35, .6, .1, .1, "", (mp) => { myColor.r = Math.floor(mp.x * 255); customize()  }, "rgb(" + myColor.r + ",0,0)")
-    addUI(.50, .6, .1, .1, "", (mp) => { myColor.g = Math.floor(mp.x * 255); customize()  }, "rgb(0," + myColor.g + ",0)")
-    addUI(.65, .6, .1, .1, "", (mp) => { myColor.b = Math.floor(mp.x * 255); customize()  }, "rgb(0,0," + myColor.b + ")")
+    addUI(.35, .6, .1, .1, "", (mp) => { myColor.r = Math.floor(mp.x * 255); saveCustomizationToLocalStorage(); customize()  }, "rgb(" + myColor.r + ",0,0)")
+    addUI(.50, .6, .1, .1, "", (mp) => { myColor.g = Math.floor(mp.x * 255); saveCustomizationToLocalStorage(); customize()  }, "rgb(0," + myColor.g + ",0)")
+    addUI(.65, .6, .1, .1, "", (mp) => { myColor.b = Math.floor(mp.x * 255); saveCustomizationToLocalStorage(); customize()  }, "rgb(0,0," + myColor.b + ")")
     var colorPickerData = null
     addUI(.80, .6, .1, .1, [], (mp) => {
         if (colorPickerData == null)
@@ -225,12 +225,28 @@ function customize(nameIsSelected = false)
         myColor.r = col.r
         myColor.g = col.g
         myColor.b = col.b
+        saveCustomizationToLocalStorage();
         customize()
         }, "rgba(0, 0, 0, 0)", "rgba(255, 255, 255, 0)", false, null, null, null, (x, y, w, h) =>
         {
             colorPickerData = drawColorPicker(x + w / 2, y + h / 2, w, h, context)
         })
     draw()
+}
+
+function saveCustomizationToLocalStorage()
+{
+    localStorage.setItem("username", myName);
+    localStorage.setItem("preferredColor", JSON.stringify(myColor));
+}
+
+function readCustomizationFromLocalStorage()
+{
+    const name = localStorage.getItem("username")
+    myName = name ? name : myName
+    const color = localStorage.getItem("preferredColor")
+    if (color)
+        myColor = JSON.parse(color);
 }
 
 function selectSpells()
