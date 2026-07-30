@@ -160,8 +160,11 @@ function createMenuButtons()
     // show all found games
     for (var i = 0; i < availableGames.length; i++)
     {
-        const num = availableGames[i]
-        addUI(.4, .1 + i * .25, .2, .2, "game: " + num, () => { joinGame(num) })
+        const num = availableGames[i].id
+        const gameDataText = ["Game with " + availableGames[i].playerCount + " player(s)", 
+                              "Created by: " + availableGames[i].creatorName,
+                              "Allowed spells: " + availableGames[i].spellCount]
+        addUI(.4, .1 + i * .25, .2, .2, gameDataText, () => { joinGame(num) })
     }
     // show previous games stats
     if (playerStats.length != 0)
