@@ -19,6 +19,7 @@ var quickCast = true
 
 const lavaColor = "rgb(255, 150, 0)"
 const groundColor = "rgb(75, 39, 0)"
+const spellAlpha = .8
 
 var availableSpells = []
 var spellTypes = []
@@ -88,8 +89,8 @@ function loadImages()
     const debuffs = ["Invulnerability", "Shackled", "Slowed", "Speed", "Brick", "Regeneration"]
     for (var i = 0; i < debuffs.length; i++)
         debuffSpriteDictionary[debuffs[i]] = loadOneImage("debuffs/"+debuffs[i])
-
 }
+
 function loadOneImage(name) 
 {
     const img = new Image();
@@ -393,7 +394,7 @@ function draw()
                 drawPixelatedImage(img, x,  y, scaledSize.x, scaledSize.y, entity.angle)
             }
             else {
-                context.fillStyle = "rgb(" + entity.color + ")"
+                context.fillStyle = "rgba(" + entity.color + "," + spellAlpha + ")"
                 context.beginPath();
                 context.ellipse(x, y, size * scale.x, size * scale.y, 0, 0, 2 * Math.PI)
                 context.fill();
