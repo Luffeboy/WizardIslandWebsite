@@ -68,22 +68,25 @@ async function start()
 
 function loadImages() 
 {
-    spriteDictionary["Wizard"] = loadOneImage("Wizard")
-    spriteDictionary["FireBall"] = loadOneImage("FireBall")
-    spriteDictionary["HomingBolt"] = loadOneImage("HomingBolt")
-    spriteDictionary["FrostField"] = loadOneImage("FrostField")
-    spriteDictionary["Barrel"] = loadOneImage("Barrel")
-    spriteDictionary["CrescentMoon"] = loadOneImage("CrescentMoon")
-    spriteDictionary["SnakeHead"] = loadOneImage("SnakeHead")
-    spriteDictionary["SnakeBody"] = loadOneImage("SnakeBody")
-    spriteDictionary["SnakeTail"] = loadOneImage("SnakeTail")
-    spriteDictionary["BlackHole"] = loadOneImage("BlackHole")
-    spriteDictionary["Swap"] = loadOneImage("Swap")
-    spriteDictionary["Crator"] = loadOneImage("Crator")
-    spriteDictionary["BloodWormTail"] = loadOneImage("BloodWormTail")
-    spriteDictionary["BloodWormBody"] = loadOneImage("BloodWormBody")
-    spriteDictionary["BloodWormHead"] = loadOneImage("BloodWormHead")
-    spriteDictionary["RailgunPartical"] = loadOneImage("RailgunPartical")
+    const sprites = ["Wizard", "FireBall", "HomingBolt", 
+        "FrostField", "Barrel", "CrescentMoon", 
+        "SnakeHead", "SnakeBody", "SnakeTail",
+        "BlackHole", "Swap", "Crator",
+        "BloodWormTail", "BloodWormBody", "BloodWormHead", 
+        "RailgunPartical"]
+    for (var i = 1; i < 7; i++)
+        sprites.push("dice/ChaosDice"+i)
+
+    console.log(sprites)
+    for (var i = 0; i < sprites.length; i++)
+    {
+        var entityId = sprites[i]
+        const lastSlashIndex = entityId.lastIndexOf("/")
+        if (lastSlashIndex != -1)
+            entityId = entityId.substring(lastSlashIndex + 1)
+        console.log(entityId)
+        spriteDictionary[entityId] = loadOneImage(sprites[i])
+    }
 
     const debuffs = ["Invulnerability", "Shackled", "Slowed", "Speed", "Brick", "Regeneration"]
     for (var i = 0; i < debuffs.length; i++)
