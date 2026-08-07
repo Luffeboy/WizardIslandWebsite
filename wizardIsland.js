@@ -73,11 +73,10 @@ function loadImages()
         "SnakeHead", "SnakeBody", "SnakeTail",
         "BlackHole", "Swap", "Crator",
         "BloodWormTail", "BloodWormBody", "BloodWormHead", 
-        "RailgunPartical"]
+        "RailgunPartical", "BlackjackHitHelper", "BlackjackStandHelper"]
     for (var i = 1; i < 7; i++)
         sprites.push("dice/ChaosDice"+i)
 
-    console.log(sprites)
     for (var i = 0; i < sprites.length; i++)
     {
         var entityId = sprites[i]
@@ -88,7 +87,9 @@ function loadImages()
         spriteDictionary[entityId] = loadOneImage(sprites[i])
     }
 
-    const debuffs = ["Invulnerability", "Shackled", "Slowed", "Speed", "Brick", "Regeneration"]
+    const debuffs = ["Invulnerability", "Shackled", "Slowed", 
+        "Speed", "Brick", "Regeneration", 
+        "BlackjackDealer", "BlackjackPlayer"]
     for (var i = 0; i < debuffs.length; i++)
         debuffSpriteDictionary[debuffs[i]] = loadOneImage("debuffs/"+debuffs[i])
 }
