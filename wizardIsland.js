@@ -83,13 +83,12 @@ function loadImages()
         const lastSlashIndex = entityId.lastIndexOf("/")
         if (lastSlashIndex != -1)
             entityId = entityId.substring(lastSlashIndex + 1)
-        console.log(entityId)
         spriteDictionary[entityId] = loadOneImage(sprites[i])
     }
 
     const debuffs = ["Invulnerability", "Shackled", "Slowed", 
         "Speed", "Brick", "Regeneration", 
-        "BlackjackDealer", "BlackjackPlayer"]
+        "BlackjackDealer", "BlackjackPlayer", "DeckOfCardsCardCount"]
     for (var i = 0; i < debuffs.length; i++)
         debuffSpriteDictionary[debuffs[i]] = loadOneImage("debuffs/"+debuffs[i])
 }
