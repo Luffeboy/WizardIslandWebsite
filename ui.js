@@ -19,12 +19,20 @@ class UIButton
         this.endHover = endHover
         this.additionalDrawFunction = additionalDrawFunction
     }
+    canScroll()
+    {
+        return false
+    }
+    tryScroll(mp)
+    {
+    }
 }
 
 function clearUIButtons()
 {
     AllUI = []
     UIOffSet = { x: 0,y: 0 }
+    clearUIButtonsV2()
 }
 
 function addUI(x, y, w, h, text, onClick = null, backgroundColor = "rgb(0, 0, 0)", textColor = "rgb(255, 255, 255)", isInteractable = false, onKeyPress = null, onHover = null, endHover = null, additionalDrawFunction = null)
@@ -47,9 +55,10 @@ function removeUI(uiElement)
         if (AllUI[i] == uiElement)
         {
             AllUI.splice(i, 1);
-            break
+            return
         }
     }
+    removeUIV2(uiElement)
 }
 
 function drawUI()
@@ -73,6 +82,7 @@ function drawUI()
         if (uiElement.additionalDrawFunction)
             uiElement.additionalDrawFunction(x * screenWidth, y * screenHeight, uiElement.w * screenWidth, uiElement.h * screenHeight)
     }
+    drawUIV2()
 }
 
 function clickedOnButton(mousePos)
@@ -98,7 +108,7 @@ function clickedOnButton(mousePos)
             return true
         }
     }
-    return false
+    return clickedOnButtonV2(mousePos)
 }
 
 function getUIElementAt(mousePos)
@@ -111,8 +121,8 @@ function getUIElementAt(mousePos)
         const x = uiElement.x + UIOffSet.x
         const y = uiElement.y + UIOffSet.y
         if (mousePos.x > x && mousePos.x < x + uiElement.w && mousePos.y > y && mousePos.y < y + uiElement.h)
-            return uiElement
+            return {element: uiElement, scaledX: (mousePos.x - x) / uiElement.w, scaledY: (mousePos.y - y) / uiElement.h }
         
     }
-    return null
+    return getUIElementAtV2MoreInfo(mousePos)
 }

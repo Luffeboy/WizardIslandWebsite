@@ -3,6 +3,8 @@ context = null
 screenWidth = 1
 screenHeight = 1
 var textHeight = 10
+var primaryMouseBtnDown = false
+var mouseClickTime = Date.now()
 var MousePosition = {x:0, y:0}
 
 var extraCanvas
@@ -15,33 +17,56 @@ function getCanvas()
     extraCanvas = document.createElement("canvas");
     extraContext = extraCanvas.getContext("2d")
     windowResized(null);
-    canvas.addEventListener("click", clickedOnPage)
+    canvas.addEventListener("click", (event) => { if (250 + mouseClickTime > Date.now()) clickedOnPage(event)})
+    canvas.addEventListener("mousedown", (event)=>{ 
+        if (event.button == 0)
+        {
+            primaryMouseBtnDown=true; 
+            mouseClickTime = Date.now()
+        } 
+    })
+    canvas.addEventListener("mouseup", (event)=>{ if (event.button == 0) primaryMouseBtnDown=false })
     canvas.addEventListener("mousemove", mouseMoved);
     window.addEventListener("keydown", keyboardDown)
     window.addEventListener("keyup", keyboardUp)
     window.addEventListener("resize", windowResized);
     document.addEventListener('contextmenu', event => event.preventDefault());
 
+    //setInterval(tempFunc, 30)
+}
+
+function tempFunc()
+{
+    draw()
 }
 
 function mouseMoved(event) 
 {
-    
     MousePosition.x = event.layerX
     MousePosition.y = event.layerY
-
-    // // check ui for hover
+    if (holdingUIElementV2 != null && primaryMouseBtnDown)
+    {
+        holdingUIElementV2.tryScroll({x: (MousePosition.x / screenWidth - holdingUIElementV2.x) / holdingUIElementV2.w, y: (MousePosition.y / screenHeight - holdingUIElementV2.y) / holdingUIElementV2.h})
+    } else holdingUIElementV2 = null
+    // check ui for hover
     const prevHoveringElement = hoveringUIElement
-    hoveringUIElement = null
-    hoveringUIElement = getUIElementAt(MousePosition);
-
+    const newHoveringUIElement = getUIElementAt(MousePosition)
+    hoveringUIElement = newHoveringUIElement?.element
     if (hoveringUIElement != prevHoveringElement)
         if (prevHoveringElement != null && prevHoveringElement.endHover != null)
             prevHoveringElement.endHover()
     
+    if (hoveringUIElement == null)
+        return
 
-    if (hoveringUIElement != null && hoveringUIElement.onHover != null)
-        hoveringUIElement.onHover({x: (MousePosition.x / screenWidth - hoveringUIElement.x) / hoveringUIElement.w, y: (MousePosition.y / screenHeight - hoveringUIElement.y) / hoveringUIElement.h})
+    var mp = {x: newHoveringUIElement.scaledX, y: newHoveringUIElement.scaledY}
+    if (hoveringUIElement.onHover != null)
+        hoveringUIElement.onHover(mp)
+    if (primaryMouseBtnDown && hoveringUIElement.canScroll(mp))
+    {
+        holdingUIElementV2 = hoveringUIElement
+        holdingUIElementV2.tryScroll(mp)
+    }
 }
 
 function setTextSize(textSize)

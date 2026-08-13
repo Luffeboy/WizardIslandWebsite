@@ -258,71 +258,81 @@ function selectSpells()
     const columns = 3
     const btnW = (1 - (columns + 2) * padding)/(columns + 1);
     const btnH = .1;
-    AllUI = []
+    const uiOffSet = UIOffSet
+    clearUIButtons()
+    UIOffSet = uiOffSet
     addUI(padding, padding, btnW, btnH, "Back", () => { createMenuButtons() })
     // show currently selected spells
     {
-        const spellCount = selectedSpellIds.length
-        //const showCurrentSpellsHeight = textHeight / screenHeight * spellCount + padding * 2
-        const amountToSide = .3
-        for (var i = 0; i < spellCount; i++)
+        const selectedSpellButtons = addUIV2(new UIElement({x:padding, y: padding * 2 + btnH, 
+                                                            w: btnW, h: 1-(padding * 3 + btnH),
+                                                        backgroundColor: "rgba(0,0,0,.1)"}))
+        function createSelectedSpellButtons()
         {
-            const index = i
-            addUI(padding, padding * 2 + btnH + (btnH + padding/4) * i, btnW, btnH, availableSpells[selectedSpellIds[i]].name, (mp) => 
-                {
-                    const selectedSpellIdsIndex = selectedSpellIds[index]
-                    
-                    if (mp.y < amountToSide)
+            selectedSpellButtons.clearChildren()
+            const spellCount = selectedSpellIds.length
+            const amountToSide = .3
+            for (var i = 0; i < spellCount; i++)
+            {
+                const index = i
+                addUIV2(new UIElement({x: padding, y: padding + (btnH + padding) * i, w: 1-padding*2, h: btnH, text: availableSpells[selectedSpellIds[i]].name, onClick: (mp) => 
                     {
-                        if (index > 0)
-                        {
-                            selectedSpellIds[index] = selectedSpellIds[index - 1]
-                            selectedSpellIds[index - 1] = selectedSpellIdsIndex
-                        }
-                        
-                    }
-                    else if (mp.y > 1-amountToSide)
-                    {
-                        if (index < selectedSpellIds.length - 1)
-                        {
-                            selectedSpellIds[index] = selectedSpellIds[index + 1]
-                            selectedSpellIds[index + 1] = selectedSpellIdsIndex
-                        }
-                    }
-                    else if (mp.x < amountToSide)
-                    {
-                        selectedSpellIds.splice(index, 1);
-                    }
-                    selectSpells()
-                  }, "rgb(0, 0, 0)", "rgb(255, 255, 255)", false, null, (mp) =>
-                    {
-                        var text = null
-                        var col = ""
+                        const selectedSpellIdsIndex = selectedSpellIds[index]
                         if (mp.y < amountToSide)
                         {
-                            col = "0,255,0"
                             if (index > 0)
-                                text = "Move up"
-                        } else if (mp.y > 1-amountToSide)
+                            {
+                                selectedSpellIds[index] = selectedSpellIds[index - 1]
+                                selectedSpellIds[index - 1] = selectedSpellIdsIndex
+                            }
+                            
+                        }
+                        else if (mp.y > 1-amountToSide)
                         {
-                            col = "0,255,0"
                             if (index < selectedSpellIds.length - 1)
-                                text = "Move down"
-                        } else if (mp.x < amountToSide)
-                        {
-                            col = "255,0,0"
-                            text = "Remove"
+                            {
+                                selectedSpellIds[index] = selectedSpellIds[index + 1]
+                                selectedSpellIds[index + 1] = selectedSpellIdsIndex
+                            }
                         }
+                        else if (mp.x < amountToSide)
+                        {
+                            selectedSpellIds.splice(index, 1);
+                        }
+                        createSelectedSpellButtons()
                         draw()
-                        if (text)
+                    }, backgroundColor: "rgb(0, 0, 0)", textColor: "rgb(255, 255, 255)", onHover: (mp) =>
                         {
-                            context.fillStyle = "rgb(" + col + ")"
-                            context.fillText(text, MousePosition.x, MousePosition.y - (textHeight + 5))
-                        }
-                    }, ()=>{draw()})
+                            var text = null
+                            var col = ""
+                            if (mp.y < amountToSide)
+                            {
+                                col = "0,255,0"
+                                if (index > 0)
+                                    text = "Move up"
+                            } else if (mp.y > 1-amountToSide)
+                            {
+                                col = "0,255,0"
+                                if (index < selectedSpellIds.length - 1)
+                                    text = "Move down"
+                            } else if (mp.x < amountToSide)
+                            {
+                                col = "255,0,0"
+                                text = "Remove"
+                            }
+                            draw()
+                            if (text)
+                            {
+                                context.fillStyle = "rgb(" + col + ")"
+                                context.fillText(text, MousePosition.x, MousePosition.y - (textHeight + 5))
+                            }
+                        }, endHover: ()=>{draw()}}), selectedSpellButtons)
+            }
+            selectedSpellButtons.tryCreateScrollbar()
+            selectedSpellButtons.checkScrollIsNotOutOfBounds()
         }
+        createSelectedSpellButtons()
     }
-
     for (var i = 0; i < spellTypes.length; i++)
     {
         const num = i
@@ -335,16 +345,21 @@ function selectSpells()
         if (availableSpells[i].type == currentlyLookingAtSpellsOfType)
             spellsToDisplay.push({id: i, spellInfo: availableSpells[i]})
 
+    var spellCanvas = addUIV2(new UIElement({x: padding + (btnW + padding), y: padding + (padding + btnH), 
+             w: (columns) * (btnW + padding) - padding, h: 1 - (padding * 3 + btnH),
+            backgroundColor: "rgba(0,0,0, .1)"}))
     for (var i = 0; i < spellsToDisplay.length; i++)
     {
         const num = i
         const name = spellsToDisplay[num].spellInfo.name
         const cooldown = spellsToDisplay[num].spellInfo.cooldown
-        const x = padding + (num % columns + 1) * (btnW + padding)
-        const y = padding + Math.floor(num / columns) * (btnH+padding) + (padding + btnH)
+        const fullW = 1 / columns
+        const w = 1 / (columns + 1)
+        const x = padding + (num % columns) * fullW
+        const y = Math.floor(num / columns) * (btnH+padding) + padding
         
         const spellId = spellsToDisplay[i].id
-        addUI(x, y, btnW, btnH, [name, "Cooldown: " + cooldown.toFixed(2)], () => { 
+        addUIV2(new UIElement({x: x, y: y, w: w, h: btnH, text: [name, "Cooldown: " + cooldown.toFixed(2)], onClick: () => { 
             const index = selectedSpellIds.indexOf(spellId);
             if (index > -1) {
                 selectedSpellIds.splice(index, 1);
@@ -352,9 +367,12 @@ function selectSpells()
             else {
                 selectedSpellIds.push(spellId)
             }
-            selectSpells()
-         })
+            createSelectedSpellButtons()
+            draw()
+         }}), spellCanvas)
     }
+    spellCanvas.tryCreateScrollbar()
+    
     draw()
 }
 
