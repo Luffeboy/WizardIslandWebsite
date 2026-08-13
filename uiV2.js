@@ -28,6 +28,7 @@ class UIElement
         this.endHover = object?.endHover ?? null
         this.additionalDrawFunction = object?.additionalDrawFunction ?? null
         this.childElements = object?.childElements ?? []
+        this.parentElement = object?.parentElement ?? null
         this.scrollX = 0
         this.scrollY = 0
 
@@ -68,8 +69,13 @@ class UIElement
     {
         if (this.scrollbarY == null)
             return
-        const prevScroll = this.scrollbarY.childElements[0].y + this.scrollbarY.childElements[0].h / 2
+        const prevScroll = this.getCurrentScrollY()
         this.tryScroll({x: 0, y: prevScroll})
+    }
+
+    getCurrentScrollY()
+    {
+        return this.scrollbarY.childElements[0].y + this.scrollbarY.childElements[0].h / 2
     }
 
     canScroll(mp)
@@ -91,6 +97,15 @@ class UIElement
     {
         this.childElements = []
     }
+
+    getScrollElementY()
+    {
+        if (this.scrollbarY != null)
+            return this
+        if (this.parentElement != null)
+            return this.parentElement.getScrollElementY()
+        return null
+    }
 }
 
 function clearUIButtonsV2()
@@ -104,6 +119,8 @@ function addUIV2(UIElement, parentElement = null)
     if (parentElement != null)
     {
         parentElement.childElements.push(UIElement)
+        UIElement.parentElement = parentElement
+
         parentElement.uiElementWasAdded()
 
     }

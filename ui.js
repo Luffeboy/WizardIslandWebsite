@@ -26,6 +26,11 @@ class UIButton
     tryScroll(mp)
     {
     }
+    getScrollElementY()
+    {
+        return null
+    }
+
 }
 
 function clearUIButtons()

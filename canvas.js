@@ -27,17 +27,28 @@ function getCanvas()
     })
     canvas.addEventListener("mouseup", (event)=>{ if (event.button == 0) primaryMouseBtnDown=false })
     canvas.addEventListener("mousemove", mouseMoved);
+    canvas.addEventListener("wheel", mouseScroll);
     window.addEventListener("keydown", keyboardDown)
     window.addEventListener("keyup", keyboardUp)
     window.addEventListener("resize", windowResized);
     document.addEventListener('contextmenu', event => event.preventDefault());
-
-    //setInterval(tempFunc, 30)
 }
 
-function tempFunc()
+function mouseScroll(event)
 {
-    draw()
+    if (hoveringUIElement == null)
+        return
+    const mouseScrollY = Math.min(1, Math.max(-1, event.deltaY))
+    const scrollSpeed = .03
+    var mp = {x: 1.0, y: mouseScrollY * scrollSpeed}
+    const scrollElement = hoveringUIElement.getScrollElementY()
+    console.log(scrollElement)
+    if (scrollElement != null && scrollElement.canScroll(mp))
+    {
+        mp.y = mp.y * scrollElement.scrollbarY.childElements[0].h + scrollElement.getCurrentScrollY()
+        scrollElement.tryScroll(mp)
+    }
+    
 }
 
 function mouseMoved(event) 
@@ -58,7 +69,6 @@ function mouseMoved(event)
     
     if (hoveringUIElement == null)
         return
-
     var mp = {x: newHoveringUIElement.scaledX, y: newHoveringUIElement.scaledY}
     if (hoveringUIElement.onHover != null)
         hoveringUIElement.onHover(mp)
