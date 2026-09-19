@@ -42,7 +42,6 @@ function mouseScroll(event)
     const scrollSpeed = .03
     var mp = {x: 1.0, y: mouseScrollY * scrollSpeed}
     const scrollElement = hoveringUIElement.getScrollElementY()
-    console.log(scrollElement)
     if (scrollElement != null && scrollElement.canScroll(mp))
     {
         mp.y = mp.y * scrollElement.scrollbarY.childElements[0].h + scrollElement.getCurrentScrollY()

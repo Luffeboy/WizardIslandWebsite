@@ -85,7 +85,6 @@ class UIElement
 
     tryScroll(mp)
     {
-        console.log(mp.y)
         const scrollbarYProgress = this.scrollbarY.childElements[0]
         this.scrollbarY.childElements[0].y = Math.max(0, Math.min(1 - scrollbarYProgress.h, mp.y - scrollbarYProgress.h / 2)) 
         var scaledY = this.scrollbarY.childElements[0].y / (1 - this.scrollbarY.childElements[0].h)
